@@ -1,0 +1,118 @@
+{
+  "n_samples": 2953,
+  "results": {
+    "rf": {
+      "default": {
+        "accuracy": 0.8794446325770403,
+        "balanced_accuracy": 0.8758325509549406,
+        "macro_f1": 0.8762425564336053
+      },
+      "best_threshold": {
+        "threshold": 0.5149999999999999,
+        "accuracy": 0.8828310193024044,
+        "balanced_accuracy": 0.8810548091341658,
+        "macro_f1": 0.8801334121699305
+      },
+      "roc_auc": 0.9505180160263706
+    },
+    "et": {
+      "default": {
+        "accuracy": 0.8868946833728412,
+        "balanced_accuracy": 0.8834720291101206,
+        "macro_f1": 0.8838904883393937
+      },
+      "best_threshold": {
+        "threshold": 0.48999999999999994,
+        "accuracy": 0.8882492380629868,
+        "balanced_accuracy": 0.8842048620975769,
+        "macro_f1": 0.8851249080518305
+      },
+      "roc_auc": 0.9571817162402939
+    },
+    "gbm": {
+      "default": {
+        "accuracy": 0.869962749746021,
+        "balanced_accuracy": 0.8666563812914041,
+        "macro_f1": 0.8666563812914041
+      },
+      "best_threshold": {
+        "threshold": 0.48499999999999993,
+        "accuracy": 0.871655943108703,
+        "balanced_accuracy": 0.8675724225257244,
+        "macro_f1": 0.8681728882239872
+      },
+      "roc_auc": 0.9440784460554019
+    },
+    "histgb": {
+      "default": {
+        "accuracy": 0.8909583474432781,
+        "balanced_accuracy": 0.889170064289867,
+        "macro_f1": 0.8884012487676635
+      },
+      "best_threshold": {
+        "threshold": 0.6649999999999999,
+        "accuracy": 0.8919742634608873,
+        "balanced_accuracy": 0.8949689933565257,
+        "macro_f1": 0.8903445611364689
+      },
+      "roc_auc": 0.9586466766635499
+    },
+    "lr": {
+      "default": {
+        "accuracy": 0.818828310193024,
+        "balanced_accuracy": 0.8220410574620084,
+        "macro_f1": 0.8166482427660804
+      },
+      "best_threshold": {
+        "threshold": 0.4549999999999999,
+        "accuracy": 0.8211987809007789,
+        "balanced_accuracy": 0.8203707815066443,
+        "macro_f1": 0.8179076448742204
+      },
+      "roc_auc": 0.900327187821614
+    },
+    "svm": {
+      "default": {
+        "accuracy": 0.8736877751439215,
+        "balanced_accuracy": 0.8716244056903211,
+        "macro_f1": 0.8707662130783111
+      },
+      "best_threshold": {
+        "threshold": 0.6649999999999999,
+        "accuracy": 0.8787673552319675,
+        "balanced_accuracy": 0.8856366615929663,
+        "macro_f1": 0.8776435975426267
+      },
+      "roc_auc": 0.9415575099859078
+    },
+    "xgb": {
+      "default": {
+        "accuracy": 0.8882492380629868,
+        "balanced_accuracy": 0.886392072233438,
+        "macro_f1": 0.8856286089854937
+      },
+      "best_threshold": {
+        "threshold": 0.6599999999999999,
+        "accuracy": 0.889265154080596,
+        "balanced_accuracy": 0.8915348382593382,
+        "macro_f1": 0.8874795279558835
+      },
+      "roc_auc": 0.957835762626082
+    }
+  },
+  "best_model": "histgb",
+  "best": {
+    "default": {
+      "accuracy": 0.8909583474432781,
+      "balanced_accuracy": 0.889170064289867,
+      "macro_f1": 0.8884012487676635
+    },
+    "best_threshold": {
+      "threshold": 0.6649999999999999,
+      "accuracy": 0.8919742634608873,
+      "balanced_accuracy": 0.8949689933565257,
+      "macro_f1": 0.8903445611364689
+    },
+    "roc_auc": 0.9586466766635499
+  }
+}

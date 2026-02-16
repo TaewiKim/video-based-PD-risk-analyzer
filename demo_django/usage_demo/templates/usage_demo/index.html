@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PD Video Biomarker Web</title>
+  <style>
+    :root {
+      --bg: #f3f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #dbe5ef;
+      --brand: #0f766e;
+      --brand-soft: #d1fae5;
+      --warn: #d97706;
+      --danger: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Pretendard", "Noto Sans KR", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, #eff8ff 0%, var(--bg) 45%);
+      padding: 20px;
+    }
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+    h1, h2, h3 { margin: 0; }
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.06rem; margin-bottom: 10px; }
+    .sub { color: var(--muted); font-size: 0.95rem; margin-top: 6px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      padding: 11px 12px;
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: #84cfc6;
+      box-shadow: 0 0 0 3px #e8f9f6;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      padding: 10px 13px;
+      cursor: pointer;
+      color: #fff;
+      background: var(--brand);
+    }
+    button.secondary { background: #334155; }
+    button.warn { background: #0369a1; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .meter {
+      margin-top: 8px;
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #ecf3f8;
+      overflow: hidden;
+    }
+    .meter span {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #14b8a6, #0f766e);
+      transition: width 220ms ease;
+    }
+    .usage {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .usage.warn { color: var(--warn); }
+    .usage.danger { color: var(--danger); }
+    .video-wrap {
+      margin-top: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      background: #0b1220;
+    }
+    video { width: 100%; display: block; max-height: 360px; }
+    .kpis {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .kpi {
+      background: #f8fbff;
+      border: 1px solid #e5edf5;
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 78px;
+    }
+    .kpi .label { color: #64748b; font-size: 0.8rem; }
+    .kpi .value { font-size: 1.15rem; font-weight: 700; margin-top: 4px; }
+    .msg {
+      margin-top: 8px;
+      color: #0f172a;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+    .msg.error { color: var(--danger); }
+    .stack { display: grid; gap: 10px; }
+    pre {
+      margin: 0;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px;
+      max-height: 300px;
+      overflow: auto;
+      font-size: 0.8rem;
+      line-height: 1.3;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { padding: 8px; border-bottom: 1px solid #e5edf5; text-align: left; }
+    th { color: #64748b; font-weight: 600; }
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+      .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div id="root" data-limit="{{ limit }}"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  {% verbatim %}
+  <script type="text/babel">
+    function getClientId() {
+      const k = 'pd_demo_client_id';
+      const old = localStorage.getItem(k);
+      if (old) return old;
+      const id = 'anon-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem(k, id);
+      return id;
+    }
+
+    const LIMIT = Number(document.getElementById('root')?.dataset?.limit || 10);
+
+    function fmtPct(v) {
+      if (v === null || v === undefined) return '-';
+      if (typeof v === 'number' && v <= 1) return `${(v * 100).toFixed(0)}%`;
+      return `${Number(v).toFixed(0)}%`;
+    }
+
+    function App() {
+      const [file, setFile] = React.useState(null);
+      const [filename, setFilename] = React.useState('');
+      const [videoUrl, setVideoUrl] = React.useState('');
+      const [loading, setLoading] = React.useState(false);
+      const [message, setMessage] = React.useState('');
+      const [error, setError] = React.useState('');
+      const [usage, setUsage] = React.useState({ used_count: 0, remaining: null, limit: null, unlimited: true });
+      const [analyzeData, setAnalyzeData] = React.useState(null);
+      const [symptomData, setSymptomData] = React.useState(null);
+      const [users, setUsers] = React.useState([]);
+      const [newUserName, setNewUserName] = React.useState('');
+      const [newUserImage, setNewUserImage] = React.useState('');
+
+      const clientId = React.useMemo(() => getClientId(), []);
+      const hasLimit = Number.isFinite(usage.limit) && usage.limit > 0;
+      const usedPct = hasLimit
+        ? Math.min(100, Math.round(((usage.used_count || 0) / usage.limit) * 100))
+        : 0;
+
+      const usageClass = hasLimit
+        ? (usage.remaining <= 0 ? 'usage danger' : usage.remaining <= 2 ? 'usage warn' : 'usage')
+        : 'usage';
+
+      async function api(path, options = {}) {
+        const headers = { ...(options.headers || {}), 'X-Client-Id': clientId };
+        const res = await fetch(path, { ...options, headers });
+        const data = await res.json().catch(() => ({}));
+        if (data.used_count !== undefined) {
+          setUsage(data);
+        }
+        if (!res.ok) {
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+        return data;
+      }
+
+      async function refreshUsage() {
+        try {
+          const data = await api('/api/status');
+          setUsage(data);
+        } catch (_) {}
+      }
+
+      async function refreshUsers() {
+        try {
+          const data = await fetch('/api/users').then((r) => r.json());
+          setUsers(Array.isArray(data) ? data : []);
+        } catch (_) {}
+      }
+
+      React.useEffect(() => {
+        refreshUsage();
+        refreshUsers();
+      }, []);
+
+      async function uploadVideo() {
+        if (!file) return;
+        setError('');
+        setMessage('Uploading...');
+        setLoading(true);
+        try {
+          const form = new FormData();
+          form.append('video', file);
+          const data = await api('/api/upload', { method: 'POST', body: form });
+          setFilename(data.filename);
+          setVideoUrl(data.video_url);
+          setMessage('Upload complete');
+        } catch (e) {
+          setError(e.message);
+          setMessage('');
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      async function runAnalyze(full) {
+        if (!filename) {
+          setError('Upload a video first.');
+          return;
+        }
+        setError('');
+        setMessage(full ? 'Running full PD scan...' : 'Running gait analysis...');
+        setLoading(true);
+        try {
+          if (full) {
+            const data = await api('/api/analyze-symptoms', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filename }),
+            });
+            setSymptomData(data);
+            setAnalyzeData(data.gait_analysis || null);
+            setMessage('Full PD scan completed');
+          } else {
+            const data = await api('/api/analyze', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filename, identify_user: false }),
+            });
+            setAnalyzeData(data);
+            setMessage('Gait analysis completed');
+          }
+        } catch (e) {
+          setError(e.message);
+          setMessage('');
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      async function registerUser() {
+        if (!newUserName || !newUserImage) {
+          setError('Provide name and face image (base64 data URL).');
+          return;
+        }
+        setError('');
+        setLoading(true);
+        try {
+          await fetch('/api/register-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newUserName, image: newUserImage }),
+          }).then(async (res) => {
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'register failed');
+          });
+          setMessage('User registered');
+          setNewUserName('');
+          setNewUserImage('');
+          refreshUsers();
+        } catch (e) {
+          setError(e.message);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      const summary = analyzeData?.summary || {};
+      const hgb = analyzeData?.ml_inference?.hgb_mediapipe || {};
+      const symptomPersons = symptomData?.persons || [];
+
+      return (
+        <div className="app">
+          <section className="card">
+            <h1>PD Video-Biomarker Web</h1>
+            <p className="sub">Django backend + React frontend · 회원가입 없이 사용 · 분석 횟수 제한 없음</p>
+            {hasLimit && <div className="meter"><span style={{ width: `${usedPct}%` }} /></div>}
+            <div className={usageClass}>
+              {hasLimit
+                ? `사용량 ${usage.used_count}/${usage.limit} · 남은 횟수 ${usage.remaining}`
+                : `오늘 사용량 ${usage.used_count}회 · 제한 없음`}
+            </div>
+            {!!message && <div className="msg">{message}</div>}
+            {!!error && <div className="msg error">{error}</div>}
+          </section>
+
+          <section className="card">
+            <h2>1) Video Upload</h2>
+            <div className="row">
+              <input type="file" accept="video/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+              <button onClick={uploadVideo} disabled={loading || !file}>Upload</button>
+            </div>
+            {videoUrl && (
+              <div className="video-wrap">
+                <video controls src={videoUrl} />
+              </div>
+            )}
+          </section>
+
+          <div className="grid">
+            <section className="card stack">
+              <h2>2) Analysis</h2>
+              <div className="row" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                <button className="secondary" onClick={() => runAnalyze(false)} disabled={loading || !filename}>Gait Analyze</button>
+                <button className="warn" onClick={() => runAnalyze(true)} disabled={loading || !filename}>Full PD Scan</button>
+              </div>
+              <div className="kpis">
+                <div className="kpi">
+                  <div className="label">Classification</div>
+                  <div className="value">{summary.overall_classification || analyzeData?.classification || '-'}</div>
+                </div>
+                <div className="kpi">
+                  <div className="label">PD Risk Score</div>
+                  <div className="value">{fmtPct(summary.avg_pd_risk_score ?? analyzeData?.pd_risk_score)}</div>
+                </div>
+                <div className="kpi">
+                  <div className="label">HGB Runtime</div>
+                  <div className="value">{hgb.available ? `${fmtPct(hgb.prob_pd)} (${hgb.pred_label || '-'})` : 'N/A'}</div>
+                </div>
+                <div className="kpi">
+                  <div className="label">Segments</div>
+                  <div className="value">{summary.n_segments ?? analyzeData?.walking_detection?.total_segments ?? '-'}</div>
+                </div>
+              </div>
+              <h3>Gait Result JSON</h3>
+              <pre>{analyzeData ? JSON.stringify(analyzeData, null, 2) : 'No result yet'}</pre>
+            </section>
+
+            <section className="card stack">
+              <h2>3) Symptom Output</h2>
+              <div className="kpis">
+                <div className="kpi">
+                  <div className="label">Detected Persons</div>
+                  <div className="value">{symptomData?.n_persons ?? '-'}</div>
+                </div>
+                <div className="kpi">
+                  <div className="label">FOG Transitions</div>
+                  <div className="value">{symptomData?.gait_analysis?.fog_transition_count ?? '-'}</div>
+                </div>
+                <div className="kpi">
+                  <div className="label">Walk Ratio</div>
+                  <div className="value">{symptomData?.gait_analysis?.biomarkers?.walk_ratio?.toFixed?.(3) ?? '-'}</div>
+                </div>
+                <div className="kpi">
+                  <div className="label">Step Count</div>
+                  <div className="value">{symptomData?.gait_analysis?.gait_metrics?.step_count ?? '-'}</div>
+                </div>
+              </div>
+              <h3>Persons</h3>
+              <pre>{symptomPersons.length ? JSON.stringify(symptomPersons, null, 2) : 'No symptom run yet'}</pre>
+            </section>
+          </div>
+
+          <div className="grid">
+            <section className="card stack">
+              <h2>4) User Management (Optional)</h2>
+              <input placeholder="user name" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
+              <input placeholder="face image base64 data URL" value={newUserImage} onChange={(e) => setNewUserImage(e.target.value)} />
+              <button onClick={registerUser} disabled={loading}>Register Face User</button>
+            </section>
+
+            <section className="card stack">
+              <h2>Registered Users</h2>
+              <table>
+                <thead>
+                  <tr><th>User ID</th><th>Name</th><th>Photo</th></tr>
+                </thead>
+                <tbody>
+                  {users.length === 0 ? (
+                    <tr><td colSpan="3">No users</td></tr>
+                  ) : users.map((u) => (
+                    <tr key={u.user_id}>
+                      <td>{u.user_id}</td>
+                      <td>{u.name}</td>
+                      <td><a href={`/api/users/${u.user_id}/photo`} target="_blank">view</a></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+  {% endverbatim %}
+</body>
+</html>

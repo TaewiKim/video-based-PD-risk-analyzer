@@ -1,0 +1,34 @@
+{
+  "task": "UPDRS multiclass (0/1/2/3), pooled CV",
+  "dataset": "CARE-PD",
+  "results": [
+    {
+      "model": "RF handcrafted baseline",
+      "accuracy": 0.7866576363020656,
+      "balanced_accuracy": 0.7834511356420588,
+      "macro_f1": 0.7800041202475733,
+      "source": "reports/pd_risk_eval_updrs_pooled.json"
+    },
+    {
+      "model": "Temporal CNN (class-weight+earlystop+scheduler)",
+      "accuracy": 0.7947849644429393,
+      "balanced_accuracy": 0.8269310640287919,
+      "macro_f1": 0.7946054276908097,
+      "source": "manual run: gait_sequence_model.py --multiclass --epochs 60 --patience 10"
+    },
+    {
+      "model": "SSL pretrain + fine-tune (order verification)",
+      "accuracy": 0.7809007788689468,
+      "balanced_accuracy": 0.7996635040204355,
+      "macro_f1": 0.7962498115505553,
+      "source": "manual run: gait_sequence_ssl.py --multiclass --folds 5 --ssl-epochs 6 --finetune-epochs 12"
+    },
+    {
+      "model": "SSL pretrain + fine-tune (order verification, tuned)",
+      "accuracy": 0.802912292583813,
+      "balanced_accuracy": 0.8109472325862651,
+      "macro_f1": 0.8132516820226486,
+      "source": "manual run: gait_sequence_ssl.py --multiclass --folds 5 --ssl-epochs 12 --finetune-epochs 40 --batch-size 64"
+    }
+  ]
+}
