@@ -394,15 +394,18 @@
         /* Chart Containers */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 20px;
             margin-top: 20px;
+            align-items: stretch;
         }
         .chart-container {
             background: var(--surface-soft);
             border-radius: 12px;
             padding: 20px;
             border: 1px solid var(--line);
+            min-width: 0;
+            overflow: hidden;
         }
         .chart-container h4 {
             color: var(--text-soft);
@@ -412,6 +415,12 @@
         .chart-wrapper {
             position: relative;
             height: 200px;
+            min-width: 0;
+        }
+        .chart-wrapper canvas {
+            display: block;
+            width: 100% !important;
+            max-width: 100%;
         }
 
         /* Comparison Bars */
@@ -2059,7 +2068,9 @@
             clearActiveResultState({ preserveUpload: true });
             document.getElementById('uploadArea').style.display = 'none';
             document.getElementById('videoSection').style.display = 'block';
-            document.getElementById('videoPlayer').src = URL.createObjectURL(file);
+            const localPreviewUrl = URL.createObjectURL(file);
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.src = localPreviewUrl;
             mountVideoSectionInResults(false);
             resizeSkeletonCanvas();
             clearSkeletonCanvas();
@@ -2070,7 +2081,13 @@
                 const data = await response.json();
                 if (data.success) {
                     setCurrentUploadFilename(data.filename);
+                    if (data.video_url) {
+                        videoPlayer.src = data.video_url;
+                        videoPlayer.load();
+                    }
                     document.getElementById('symptomBtn').disabled = false;
+                } else {
+                    URL.revokeObjectURL(localPreviewUrl);
                 }
             } catch (error) { console.error('Upload error:', error); }
         }

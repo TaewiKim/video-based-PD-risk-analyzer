@@ -1,5 +1,6 @@
 import base64
 import mimetypes
+import subprocess
 import uuid
 
 import cv2
@@ -11,9 +12,54 @@ from django.views.decorators.http import require_GET, require_POST
 from .api_common import ensure_analyzers, parse_json_body
 from .runtime import ALLOWED_EXTENSIONS, PROFILE_DIR, UPLOAD_DIR
 
+ANALYSIS_MAX_SIDE = 320
+
 
 def _allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def _normalized_dimensions(video_path, max_side: int = ANALYSIS_MAX_SIDE):
+    cap = cv2.VideoCapture(str(video_path))
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    cap.release()
+    if width <= 0 or height <= 0:
+        raise ValueError("Failed to read uploaded video dimensions")
+
+    scale = min(1.0, max_side / float(max(width, height)))
+    target_width = max(2, int(round(width * scale)))
+    target_height = max(2, int(round(height * scale)))
+    if target_width % 2:
+        target_width -= 1
+    if target_height % 2:
+        target_height -= 1
+    return max(2, target_width), max(2, target_height)
+
+
+def _normalize_video_for_analysis(source_path, target_path):
+    target_width, target_height = _normalized_dimensions(source_path)
+    cmd = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(source_path),
+        "-vf",
+        f"scale={target_width}:{target_height}",
+        "-an",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        "23",
+        "-pix_fmt",
+        "yuv420p",
+        "-movflags",
+        "+faststart",
+        str(target_path),
+    ]
+    subprocess.run(cmd, check=True, capture_output=True)
 
 
 @csrf_exempt
@@ -25,12 +71,22 @@ def api_upload(request):
     if not video.name or not _allowed_file(video.name):
         return JsonResponse({"error": "Invalid file type"}, status=400)
 
+    upload_id = uuid.uuid4().hex
     ext = video.name.rsplit(".", 1)[1].lower()
-    filename = f"{uuid.uuid4().hex}.{ext}"
+    raw_path = UPLOAD_DIR / f"{upload_id}.source.{ext}"
+    filename = f"{upload_id}.mp4"
     filepath = UPLOAD_DIR / filename
-    with open(filepath, "wb") as f:
+    with open(raw_path, "wb") as f:
         for chunk in video.chunks():
             f.write(chunk)
+    try:
+        _normalize_video_for_analysis(raw_path, filepath)
+    except Exception as exc:
+        if filepath.exists():
+            filepath.unlink()
+        raw_path.unlink(missing_ok=True)
+        return JsonResponse({"error": f"Failed to normalize video: {exc}"}, status=500)
+    raw_path.unlink(missing_ok=True)
 
     return JsonResponse({"success": True, "filename": filename, "video_url": f"/videos/{filename}"})
 
