@@ -29,6 +29,8 @@ dependencies = [
     "arxiv>=2.0",
     # Data loading
     "pandas>=2.0",
+    # Runtime model loading / inference
+    "scikit-learn==1.8.0",
     # HuggingFace (optional dataset download)
     "huggingface_hub>=0.20",
     # Experiment tracking
@@ -49,6 +51,11 @@ cv = [
     # MediaPipe for pose/face detection (not available on all platforms)
     "mediapipe>=0.10",
 ]
+pose = [
+    # OpenMMLab RTMW whole-body pose backend
+    "rtmlib>=0.0.15",
+    "onnxruntime>=1.24",
+]
 ecg = [
     # ECG signal processing
     "neurokit2>=0.2",
@@ -57,6 +64,11 @@ ecg = [
 audio = [
     # Audio processing (requires cmake for llvmlite)
     "librosa>=0.10",
+]
+server = [
+    # Django production serving
+    "gunicorn>=23.0",
+    "whitenoise>=6.8",
 ]
 
 [project.scripts]

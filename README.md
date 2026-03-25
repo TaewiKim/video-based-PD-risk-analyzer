@@ -15,12 +15,39 @@ Video-based health monitoring research automation toolkit.
 # Using uv
 uv sync
 
-# With MediaPipe for full pose/face detection
+# With pose backends for web analysis
 uv sync --extra cv
+uv sync --extra pose
 
 # Development
 uv sync --extra dev
+
+# Django service runtime
+uv sync --extra pose --extra server
 ```
+
+## Django Service
+
+The web UI and API are now embedded in the Django app under `server/`.
+
+```bash
+# Apply migrations
+python manage.py migrate
+
+# Start development server
+python manage.py runserver
+
+# Or use the helper script
+./scripts/run_django_server.sh
+```
+
+Open `http://127.0.0.1:8000`.
+
+Production notes:
+
+- `scripts/run_django_server.sh` runs `collectstatic` and starts Gunicorn with the production settings module.
+- Static files are served in production via WhiteNoise.
+- API surface summary: [`docs/API_REFERENCE.md`](/workspace/video-based-PD-risk-analyzer/docs/API_REFERENCE.md)
 
 ## Quick Start
 
@@ -73,6 +100,7 @@ RF baseline vs CARE-PD official 코드 직접 실행/비교 절차는 아래 문
 
 - `docs/CAREPD_REPRO.md`
 - `docs/PROJECT_FULL_DOCUMENTATION.md` (프로젝트 개념/문헌/아키텍처/분석 파이프라인/평가/결과 통합 문서)
+- `docs/MODELS_AND_FORMULAS.md` (사용 모델, 문헌 cutoff, 통계식, 참고 문헌 정리)
 - `docs/RESEARCH_NOTE_PD_RISK_2026-02-15.md` (PD risk 모델 개선 실험 노트)
 
 ## Project Structure
@@ -87,6 +115,10 @@ research-automation/
 ├── config/
 │   ├── settings.yaml
 │   └── search_queries.yaml
+├── server/
+│   ├── webapp/         # Django API, embedded UI, analysis services
+│   └── runtime/        # Uploaded videos, models, saved results
+├── manage.py           # Django entrypoint
 └── tests/
 ```
 

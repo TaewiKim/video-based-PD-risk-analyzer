@@ -2,13 +2,15 @@
 Pose Feature Extraction from Video
 ==================================
 
-Extract pose features from video using OpenCV and optional MediaPipe.
-Supports both 2D keypoint extraction and derived gait/movement features.
+Extract pose features from video using OpenCV with pluggable pose backends.
+Supports MediaPipe and RTMW whole-body inference, while exposing a stable
+33-keypoint interface to downstream gait code.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import os
 from pathlib import Path
 from typing import Iterator
 
@@ -22,6 +24,14 @@ try:
 except ImportError:
     MEDIAPIPE_AVAILABLE = False
     mp = None
+
+try:
+    from rtmlib import BodyWithFeet, Wholebody
+    RTMLIB_AVAILABLE = True
+except ImportError:
+    RTMLIB_AVAILABLE = False
+    BodyWithFeet = None
+    Wholebody = None
 
 
 @dataclass
@@ -96,14 +106,50 @@ class PoseExtractor:
 
     def __init__(
         self,
+        backend: str = "auto",
         use_mediapipe: bool = True,
         min_detection_confidence: float = 0.5,
         min_tracking_confidence: float = 0.5,
     ):
-        self.use_mediapipe = use_mediapipe and MEDIAPIPE_AVAILABLE
+        self.backend = self._resolve_backend(backend=backend, use_mediapipe=use_mediapipe)
+        self.use_mediapipe = self.backend == "mediapipe"
         self.min_detection_confidence = min_detection_confidence
         self.min_tracking_confidence = min_tracking_confidence
+        self.rtmw_mode = self._resolve_rtmw_mode()
+        self.max_inference_size = self._resolve_max_inference_size()
         self._pose = None
+        self._wholebody = None
+        self._rtmw_unavailable = False
+        self._face_cascade = None
+
+    @staticmethod
+    def _resolve_rtmw_mode() -> str:
+        configured = os.getenv("RTMW_MODE")
+        configured = (configured or "").strip().lower()
+        if configured in {"performance", "balanced", "lightweight"}:
+            return configured
+        return "lightweight"
+
+    @staticmethod
+    def _resolve_max_inference_size() -> int:
+        try:
+            return max(0, int(os.getenv("POSE_MAX_INFERENCE_SIZE", "640")))
+        except ValueError:
+            return 640
+
+    def _resolve_backend(self, backend: str, use_mediapipe: bool) -> str:
+        backend = (backend or "auto").lower()
+        if backend == "auto":
+            if RTMLIB_AVAILABLE:
+                return "rtmw"
+            if use_mediapipe and MEDIAPIPE_AVAILABLE:
+                return "mediapipe"
+            return "none"
+        if backend == "rtmw":
+            return "rtmw" if RTMLIB_AVAILABLE else "none"
+        if backend == "mediapipe":
+            return "mediapipe" if use_mediapipe and MEDIAPIPE_AVAILABLE else "none"
+        return "none"
 
     @property
     def pose_model(self):
@@ -116,6 +162,65 @@ class PoseExtractor:
                 min_tracking_confidence=self.min_tracking_confidence,
             )
         return self._pose
+
+    @property
+    def wholebody_model(self):
+        """Lazy-load RTMLib pose model for gait-focused extraction."""
+        if (
+            self._wholebody is None
+            and not self._rtmw_unavailable
+            and self.backend == "rtmw"
+            and (BodyWithFeet is not None or Wholebody is not None)
+        ):
+            try:
+                model_cls = BodyWithFeet if BodyWithFeet is not None else Wholebody
+                self._wholebody = model_cls(
+                    mode=self.rtmw_mode,
+                    to_openpose=True,
+                    backend="onnxruntime",
+                    device="cpu",
+                )
+            except Exception:
+                self._rtmw_unavailable = True
+                if MEDIAPIPE_AVAILABLE:
+                    self.backend = "mediapipe"
+                    self.use_mediapipe = True
+                else:
+                    self.backend = "none"
+                    self.use_mediapipe = False
+                self._wholebody = None
+        return self._wholebody
+
+    @property
+    def face_cascade(self):
+        """Lazy-load OpenCV face cascade for person-first crop proposals."""
+        if self._face_cascade is None:
+            cascade_path = Path(cv2.data.haarcascades) / "haarcascade_frontalface_default.xml"
+            if cascade_path.exists():
+                self._face_cascade = cv2.CascadeClassifier(str(cascade_path))
+            else:
+                self._face_cascade = False
+        return self._face_cascade if self._face_cascade is not False else None
+
+    def _person_first_crop_attempts(self, frame: np.ndarray) -> list[tuple[int, int, int, int]]:
+        h, w = frame.shape[:2]
+        attempts: list[tuple[int, int, int, int]] = []
+        cascade = self.face_cascade
+        if cascade is None:
+            return attempts
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4, minSize=(24, 24))
+        for (x, y, fw, fh) in faces[:2]:
+            cx = x + fw / 2.0
+            top = max(0, int(y - fh * 1.0))
+            bottom = min(h, int(y + fh * 7.0))
+            half_width = max(int(fw * 3.2), int((bottom - top) * 0.32))
+            left = max(0, int(cx - half_width))
+            right = min(w, int(cx + half_width))
+            if right - left > 40 and bottom - top > 60:
+                attempts.append((left, top, right, bottom))
+        return attempts
 
     def extract_from_video(
         self,
@@ -173,8 +278,8 @@ class PoseExtractor:
 
         cap.release()
 
-        n_keypoints = 33 if self.use_mediapipe else 0
-        keypoint_names = MEDIAPIPE_POSE_LANDMARKS if self.use_mediapipe else []
+        n_keypoints = 33 if self.backend in {"mediapipe", "rtmw"} else 0
+        keypoint_names = MEDIAPIPE_POSE_LANDMARKS if n_keypoints == 33 else []
 
         return PoseSequence(
             frames=frames,
@@ -187,28 +292,198 @@ class PoseExtractor:
 
     def _extract_frame(self, frame: np.ndarray) -> np.ndarray | None:
         """Extract pose from single frame."""
+        if self.backend == "rtmw":
+            keypoints = self._extract_frame_rtmw(frame)
+            if keypoints is not None:
+                return keypoints
+            if self.backend != "rtmw":
+                return self._extract_frame(frame)
+            return None
         if not self.use_mediapipe or self.pose_model is None:
             return None
 
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = self.pose_model.process(rgb)
+        return self._extract_frame_mediapipe(frame)
 
-        if results.pose_landmarks is None:
+    def _extract_frame_mediapipe(self, frame: np.ndarray) -> np.ndarray | None:
+        """Extract MediaPipe pose with a few crop retries for distant subjects."""
+        h, w = frame.shape[:2]
+        if h <= 0 or w <= 0:
             return None
 
-        h, w = frame.shape[:2]
-        keypoints = []
+        crop_attempts = [
+            (0, 0, w, h),
+            *self._person_first_crop_attempts(frame),
+            (int(w * 0.12), int(h * 0.02), int(w * 0.88), h),
+            (int(w * 0.20), int(h * 0.05), int(w * 0.80), h),
+            (int(w * 0.28), int(h * 0.08), int(w * 0.72), h),
+        ]
 
-        for lm in results.pose_landmarks.landmark:
-            keypoints.append([lm.x * w, lm.y * h, lm.visibility])
+        best_keypoints = None
+        best_score = -1.0
 
-        return np.array(keypoints)
+        for x1, y1, x2, y2 in crop_attempts:
+            x1 = max(0, min(x1, w - 1))
+            y1 = max(0, min(y1, h - 1))
+            x2 = max(x1 + 1, min(x2, w))
+            y2 = max(y1 + 1, min(y2, h))
+
+            crop = frame[y1:y2, x1:x2]
+            if crop.size == 0:
+                continue
+
+            rgb = cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)
+            results = self.pose_model.process(rgb)
+            if results.pose_landmarks is None:
+                continue
+
+            crop_h, crop_w = crop.shape[:2]
+            keypoints = []
+            visible_scores = []
+            for lm in results.pose_landmarks.landmark:
+                px = x1 + (lm.x * crop_w)
+                py = y1 + (lm.y * crop_h)
+                vis = float(lm.visibility)
+                keypoints.append([px, py, vis])
+                visible_scores.append(vis)
+
+            score = float(np.mean(visible_scores)) if visible_scores else 0.0
+            if score > best_score:
+                best_score = score
+                best_keypoints = np.array(keypoints, dtype=float)
+
+        return best_keypoints
+
+    def _extract_frame_rtmw(self, frame: np.ndarray) -> np.ndarray | None:
+        """Extract RTMW whole-body pose and adapt it to the 33-keypoint schema."""
+        if self.wholebody_model is None:
+            return None
+
+        model_frame = frame
+        resize_scale = 1.0
+        if self.max_inference_size > 0:
+            h, w = frame.shape[:2]
+            longest_side = max(h, w)
+            if longest_side > self.max_inference_size:
+                resize_scale = self.max_inference_size / float(longest_side)
+                resized_w = max(1, int(round(w * resize_scale)))
+                resized_h = max(1, int(round(h * resize_scale)))
+                model_frame = cv2.resize(frame, (resized_w, resized_h), interpolation=cv2.INTER_AREA)
+
+        keypoints, scores = self.wholebody_model(model_frame)
+        keypoints = np.asarray(keypoints)
+        scores = np.asarray(scores)
+
+        if keypoints.size == 0 or scores.size == 0:
+            return None
+
+        if keypoints.ndim == 2:
+            keypoints = keypoints[None, ...]
+        if scores.ndim == 1:
+            scores = scores[None, ...]
+
+        if resize_scale != 1.0:
+            keypoints[..., :2] /= resize_scale
+
+        body_scores = scores[:, :18] if scores.shape[1] >= 18 else scores
+        best_idx = int(np.argmax(np.mean(body_scores, axis=1)))
+        inst_xy = keypoints[best_idx]
+        inst_scores = scores[best_idx]
+        return self._openpose_to_mediapipe33(inst_xy, inst_scores)
+
+    @staticmethod
+    def _openpose_to_mediapipe33(keypoints_xy: np.ndarray, scores: np.ndarray) -> np.ndarray:
+        """
+        Map OpenPose-style 18 body keypoints to the MediaPipe-style 33-keypoint layout
+        used by the rest of the repository. Unavailable joints remain zero-filled.
+        """
+        out = np.zeros((33, 3), dtype=float)
+        n = min(len(keypoints_xy), len(scores))
+        if n >= 27:
+            # RTMLib BodyWithFeet(to_openpose=True) currently emits a 27-keypoint layout
+            # whose lower-body ordering differs from OpenPose BODY_25. In this layout,
+            # hips/knees/ankles are stored in 8..13 and the six foot points are 21..26.
+            mapping = {
+                0: 0,   # nose
+                16: 2,  # left_eye
+                14: 5,  # right_eye
+                17: 7,  # left_ear
+                15: 8,  # right_ear
+                5: 11,  # left_shoulder
+                2: 12,  # right_shoulder
+                6: 13,  # left_elbow
+                3: 14,  # right_elbow
+                7: 15,  # left_wrist
+                4: 16,  # right_wrist
+                11: 23, # left_hip
+                8: 24,  # right_hip
+                12: 25, # left_knee
+                9: 26,  # right_knee
+                13: 27, # left_ankle
+                10: 28, # right_ankle
+                25: 29, # left_heel
+                26: 30, # right_heel
+                23: 31, # left_foot_index
+                24: 32, # right_foot_index
+            }
+        elif n >= 25:
+            mapping = {
+                0: 0,   # nose
+                16: 2,  # left_eye
+                15: 5,  # right_eye
+                18: 7,  # left_ear
+                17: 8,  # right_ear
+                5: 11,  # left_shoulder
+                2: 12,  # right_shoulder
+                6: 13,  # left_elbow
+                3: 14,  # right_elbow
+                7: 15,  # left_wrist
+                4: 16,  # right_wrist
+                12: 23, # left_hip
+                9: 24,  # right_hip
+                13: 25, # left_knee
+                10: 26, # right_knee
+                14: 27, # left_ankle
+                11: 28, # right_ankle
+                21: 29, # left_heel
+                24: 30, # right_heel
+                19: 31, # left_foot_index (big toe)
+                22: 32, # right_foot_index (big toe)
+            }
+        else:
+            mapping = {
+                0: 0,   # nose
+                15: 2,  # left_eye
+                14: 5,  # right_eye
+                17: 7,  # left_ear
+                16: 8,  # right_ear
+                5: 11,  # left_shoulder
+                2: 12,  # right_shoulder
+                6: 13,  # left_elbow
+                3: 14,  # right_elbow
+                7: 15,  # left_wrist
+                4: 16,  # right_wrist
+                11: 23, # left_hip
+                8: 24,  # right_hip
+                12: 25, # left_knee
+                9: 26,  # right_knee
+                13: 27, # left_ankle
+                10: 28, # right_ankle
+            }
+
+        for src_idx, dst_idx in mapping.items():
+            if src_idx >= n:
+                continue
+            out[dst_idx, 0] = float(keypoints_xy[src_idx, 0])
+            out[dst_idx, 1] = float(keypoints_xy[src_idx, 1])
+            out[dst_idx, 2] = float(scores[src_idx])
+        return out
 
     def close(self):
         """Release resources."""
         if self._pose is not None:
             self._pose.close()
             self._pose = None
+        self._wholebody = None
 
     def __enter__(self):
         return self

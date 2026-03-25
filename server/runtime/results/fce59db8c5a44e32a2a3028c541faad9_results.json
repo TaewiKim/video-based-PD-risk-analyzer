@@ -1,0 +1,455 @@
+{
+  "video_info": {
+    "path": "/workspace/video-based-PD-risk-analyzer/server/runtime/uploads/fce59db8c5a44e32a2a3028c541faad9.webm",
+    "fps": 23.976023976023978,
+    "analysis_fps": 30.0,
+    "total_frames": 460,
+    "duration": 19.18583333333333,
+    "resolution": "320x180"
+  },
+  "user": {
+    "identified": false,
+    "user_id": null,
+    "user_name": null,
+    "confidence": 0.0,
+    "height_cm": 170.0
+  },
+  "walking_detection": {
+    "total_segments": 2,
+    "segments_meeting_pose_quality": 2,
+    "excluded_low_quality_segments": 0,
+    "total_walking_time": 12.200000000000003,
+    "walking_ratio": 0.6365217391304347,
+    "min_segment_duration_required": 1.0,
+    "min_pose_quality_required": 0.45,
+    "min_segment_quality_ratio_required": 0.6,
+    "segments": [
+      {
+        "start_time": 0.36666666666666664,
+        "end_time": 5.4,
+        "duration": 5.033333333333334,
+        "confidence": 0.5030391700983672,
+        "pose_quality_mean": 0.7164079653661904,
+        "pose_quality_valid_ratio": 0.8609271523178808,
+        "meets_pose_quality": true
+      },
+      {
+        "start_time": 12.0,
+        "end_time": 19.166666666666668,
+        "duration": 7.166666666666668,
+        "confidence": 0.44452460443207714,
+        "pose_quality_mean": 0.7659492090258372,
+        "pose_quality_valid_ratio": 0.9255813953488372,
+        "meets_pose_quality": true
+      }
+    ]
+  },
+  "preprocessing": {
+    "applied": true,
+    "target_fps": 30.0,
+    "source_fps": 23.976023976023978,
+    "detection_rate": 1.0,
+    "mean_pose_quality": 0.771649587837113,
+    "checks": {
+      "detection_rate_ok": true,
+      "mean_pose_quality_ok": true
+    },
+    "normalization": {
+      "translation_alignment": "pelvis_center",
+      "scale_normalization": "shoulder_distance",
+      "smoothing_window": 5
+    },
+    "input_shape": [
+      460,
+      33,
+      3
+    ],
+    "output_shape": [
+      575,
+      33,
+      3
+    ]
+  },
+  "analysis_results": [
+    {
+      "segment_id": "seg_1",
+      "user_id": null,
+      "user_name": "Unknown",
+      "start_time": 0.36666666666666664,
+      "end_time": 5.4,
+      "duration": 5.033333333333334,
+      "walking_speed": 0.318,
+      "stride_length": 0.4000000059604645,
+      "cadence": 95.4,
+      "step_width": 0.029999999329447746,
+      "asymmetry": 0.7390000224113464,
+      "stability_score": 0.166,
+      "classification": "Single literature cutoff abnormal",
+      "risk_level": "Moderate",
+      "confidence": 0.3603812683496682,
+      "percentile": 0,
+      "stride_time_cv": 1.57,
+      "arm_swing_asymmetry": 0.5789999961853027,
+      "arm_swing_amplitude": 1.0,
+      "step_time_asymmetry": 0.05,
+      "pd_risk_score": 0.333,
+      "pd_risk_level": "Moderate",
+      "hgb_pd_probability": 0.9999877618098543,
+      "hgb_predicted_label": "PD Risk"
+    },
+    {
+      "segment_id": "seg_2",
+      "user_id": null,
+      "user_name": "Unknown",
+      "start_time": 12.0,
+      "end_time": 19.166666666666668,
+      "duration": 7.166666666666668,
+      "walking_speed": 0.391,
+      "stride_length": 0.4000000059604645,
+      "cadence": 117.2,
+      "step_width": 0.029999999329447746,
+      "asymmetry": 0.5450000166893005,
+      "stability_score": 0.047,
+      "classification": "Multiple literature cutoffs abnormal",
+      "risk_level": "High",
+      "confidence": 0.34048326915727267,
+      "percentile": 93,
+      "stride_time_cv": 11.27,
+      "arm_swing_asymmetry": 0.3440000116825104,
+      "arm_swing_amplitude": 1.2999999523162842,
+      "step_time_asymmetry": 0.05,
+      "pd_risk_score": 0.667,
+      "pd_risk_level": "High",
+      "hgb_pd_probability": 0.06099902646618691,
+      "hgb_predicted_label": "PD Risk"
+    }
+  ],
+  "summary": {
+    "n_segments": 2,
+    "total_duration": 12.2,
+    "avg_speed": 0.355,
+    "speed_std": 0.037,
+    "avg_stride_length": 0.4,
+    "stride_length_std": 0.0,
+    "avg_cadence": 106.3,
+    "cadence_std": 10.9,
+    "avg_step_width": 0.03,
+    "avg_asymmetry": 0.642,
+    "avg_stability": 0.107,
+    "avg_stride_time_cv": 6.42,
+    "stride_time_cv_std": 4.85,
+    "avg_arm_swing_asymmetry": 0.461,
+    "avg_arm_swing_amplitude": 1.1,
+    "avg_step_time_asymmetry": 0.05,
+    "avg_pd_risk_score": 0.5,
+    "pd_risk_score_std": 0.167,
+    "overall_classification": "Single literature cutoff abnormal",
+    "overall_risk": "High",
+    "overall_pd_risk_level": "High",
+    "avg_percentile": 46
+  },
+  "statistical_analysis": {
+    "n_segments_total": 2,
+    "n_segments_analyzed": 2,
+    "min_segment_duration_sec": 1.0,
+    "total_walking_time_sec": 12.2,
+    "parameters": {
+      "walking_speed": {
+        "parameter": "walking_speed",
+        "n_segments": 2,
+        "mean": 0.3545,
+        "std": 0.0516,
+        "cv": 14.56,
+        "min": 0.318,
+        "max": 0.391,
+        "ci_95": [
+          -0.1093,
+          0.8183
+        ],
+        "values": [
+          0.318,
+          0.391
+        ]
+      },
+      "stride_length": {
+        "parameter": "stride_length",
+        "n_segments": 2,
+        "mean": 0.4,
+        "std": 0.0,
+        "cv": 0.0,
+        "min": 0.4,
+        "max": 0.4,
+        "ci_95": [
+          0.4,
+          0.4
+        ],
+        "values": [
+          0.4000000059604645,
+          0.4000000059604645
+        ]
+      },
+      "cadence": {
+        "parameter": "cadence",
+        "n_segments": 2,
+        "mean": 106.3,
+        "std": 15.4149,
+        "cv": 14.5,
+        "min": 95.4,
+        "max": 117.2,
+        "ci_95": [
+          -32.1976,
+          244.7976
+        ],
+        "values": [
+          95.4,
+          117.2
+        ]
+      },
+      "step_width": {
+        "parameter": "step_width",
+        "n_segments": 2,
+        "mean": 0.03,
+        "std": 0.0,
+        "cv": 0.0,
+        "min": 0.03,
+        "max": 0.03,
+        "ci_95": [
+          0.03,
+          0.03
+        ],
+        "values": [
+          0.029999999329447746,
+          0.029999999329447746
+        ]
+      },
+      "asymmetry": {
+        "parameter": "asymmetry",
+        "n_segments": 2,
+        "mean": 0.642,
+        "std": 0.1372,
+        "cv": 21.37,
+        "min": 0.545,
+        "max": 0.739,
+        "ci_95": [
+          -0.5905,
+          1.8745
+        ],
+        "values": [
+          0.7390000224113464,
+          0.5450000166893005
+        ]
+      },
+      "stability_score": {
+        "parameter": "stability_score",
+        "n_segments": 2,
+        "mean": 0.1065,
+        "std": 0.0841,
+        "cv": 79.01,
+        "min": 0.047,
+        "max": 0.166,
+        "ci_95": [
+          -0.6495,
+          0.8625
+        ],
+        "values": [
+          0.166,
+          0.047
+        ]
+      },
+      "stride_time_cv": {
+        "parameter": "stride_time_cv",
+        "n_segments": 2,
+        "mean": 6.42,
+        "std": 6.8589,
+        "cv": 106.84,
+        "min": 1.57,
+        "max": 11.27,
+        "ci_95": [
+          -55.2051,
+          68.0451
+        ],
+        "values": [
+          1.57,
+          11.27
+        ]
+      },
+      "arm_swing_asymmetry": {
+        "parameter": "arm_swing_asymmetry",
+        "n_segments": 2,
+        "mean": 0.4615,
+        "std": 0.1662,
+        "cv": 36.01,
+        "min": 0.344,
+        "max": 0.579,
+        "ci_95": [
+          -1.0315,
+          1.9545
+        ],
+        "values": [
+          0.5789999961853027,
+          0.3440000116825104
+        ]
+      },
+      "arm_swing_amplitude": {
+        "parameter": "arm_swing_amplitude",
+        "n_segments": 2,
+        "mean": 1.15,
+        "std": 0.2121,
+        "cv": 18.45,
+        "min": 1.0,
+        "max": 1.3,
+        "ci_95": [
+          -0.7559,
+          3.0559
+        ],
+        "values": [
+          1.0,
+          1.2999999523162842
+        ]
+      },
+      "step_time_asymmetry": {
+        "parameter": "step_time_asymmetry",
+        "n_segments": 2,
+        "mean": 0.05,
+        "std": 0.0,
+        "cv": 0.0,
+        "min": 0.05,
+        "max": 0.05,
+        "ci_95": [
+          0.05,
+          0.05
+        ],
+        "values": [
+          0.05,
+          0.05
+        ]
+      },
+      "pd_risk_score": {
+        "parameter": "pd_risk_score",
+        "n_segments": 2,
+        "mean": 0.5,
+        "std": 0.2362,
+        "cv": 47.23,
+        "min": 0.333,
+        "max": 0.667,
+        "ci_95": [
+          -1.6219,
+          2.6219
+        ],
+        "values": [
+          0.333,
+          0.667
+        ]
+      }
+    },
+    "pd_assessment": {
+      "indicators": {
+        "stride_variability": {
+          "threshold": 2.6,
+          "mean": 6.42,
+          "std": 6.858935777509511,
+          "ci_95": [
+            -55.205092971695656,
+            68.04509297169565
+          ],
+          "abnormal_count": 1,
+          "abnormal_pct": 50.0,
+          "t_statistic": 0.788,
+          "p_value": 0.2876,
+          "statistically_abnormal": false
+        },
+        "arm_swing": {
+          "threshold": 0.1,
+          "mean": 0.46149998903274536,
+          "std": 0.16617007553577423,
+          "ci_95": [
+            -1.0314789053875235,
+            1.9544788834530142
+          ],
+          "abnormal_count": 2,
+          "abnormal_pct": 100.0,
+          "t_statistic": 3.077,
+          "p_value": 0.1,
+          "statistically_abnormal": false
+        },
+        "step_timing": {
+          "threshold": 0.05,
+          "mean": 0.05,
+          "std": 0.0,
+          "ci_95": [
+            0.05,
+            0.05
+          ],
+          "abnormal_count": 0,
+          "abnormal_pct": 0.0,
+          "t_statistic": null,
+          "p_value": null,
+          "statistically_abnormal": false
+        }
+      },
+      "arm_swing_amplitude": {
+        "mean": 1.149999976158142,
+        "std": 0.21213200688362122,
+        "assessment": "Reduced (PD-like)"
+      },
+      "overall": {
+        "risk_score_mean": 0.5,
+        "risk_score_std": 0.236,
+        "risk_level": "Moderate",
+        "n_abnormal_indicators": 0,
+        "confidence": "Some indicators suggest possible impairment"
+      }
+    },
+    "reliability_score": 0.713,
+    "analysis_quality": "Poor"
+  },
+  "ml_inference": {
+    "hgb_mediapipe": {
+      "available": true,
+      "model_id": "hgb_mediapipe_runtime_v1",
+      "feature_names": [
+        "walking_speed",
+        "stride_length",
+        "cadence",
+        "step_width",
+        "asymmetry",
+        "stability_score",
+        "stride_time_cv",
+        "arm_swing_asymmetry",
+        "arm_swing_amplitude",
+        "step_time_asymmetry"
+      ],
+      "threshold": 0.05,
+      "prob_pd": 0.5304933941380205,
+      "pred_label": "PD Risk",
+      "segments_evaluated": 2,
+      "error": null,
+      "segment_results": [
+        {
+          "segment_id": "seg_1",
+          "available": true,
+          "prob_pd": 0.9999877618098543,
+          "pred_label": "PD Risk",
+          "error": null
+        },
+        {
+          "segment_id": "seg_2",
+          "available": true,
+          "prob_pd": 0.06099902646618691,
+          "pred_label": "PD Risk",
+          "error": null
+        }
+      ]
+    },
+    "hgb_carepd_smpl_baseline": {
+      "available": false,
+      "model_id": "hgb_carepd_smpl_handcrafted_v1",
+      "reason": "feature_mismatch_smpl_vs_mediapipe",
+      "expected_input": {
+        "pose": "(T,72) axis-angle",
+        "trans": "(T,3)",
+        "fps": "float"
+      }
+    }
+  }
+}

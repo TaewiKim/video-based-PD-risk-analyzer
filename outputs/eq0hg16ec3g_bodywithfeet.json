@@ -1,0 +1,106 @@
+{
+  "video_info": {
+    "path": "examples/Parkinson's Disease Freezing & Festinating Gait [EQ0HG16EC3g]_320.webm",
+    "fps": 23.976023976023978,
+    "analysis_fps": 30.0,
+    "total_frames": 460,
+    "duration": 19.18583333333333,
+    "resolution": "320x180"
+  },
+  "user": {
+    "identified": false,
+    "user_id": null,
+    "user_name": null,
+    "confidence": 0.0,
+    "height_cm": 170.0
+  },
+  "walking_detection": {
+    "total_segments": 0,
+    "segments_meeting_pose_quality": 0,
+    "excluded_low_quality_segments": 0,
+    "total_walking_time": 0,
+    "walking_ratio": 0.0,
+    "min_segment_duration_required": 1.0,
+    "min_pose_quality_required": 0.45,
+    "min_segment_quality_ratio_required": 0.6,
+    "segments": []
+  },
+  "preprocessing": {
+    "applied": true,
+    "target_fps": 30.0,
+    "source_fps": 23.976023976023978,
+    "detection_rate": 1.0,
+    "mean_pose_quality": 0.7734070154867468,
+    "checks": {
+      "detection_rate_ok": true,
+      "mean_pose_quality_ok": true
+    },
+    "normalization": {
+      "translation_alignment": "pelvis_center",
+      "scale_normalization": "shoulder_distance",
+      "smoothing_window": 5
+    },
+    "input_shape": [
+      460,
+      33,
+      3
+    ],
+    "output_shape": [
+      575,
+      33,
+      3
+    ]
+  },
+  "analysis_results": [],
+  "summary": null,
+  "statistical_analysis": {
+    "n_segments_total": 0,
+    "n_segments_analyzed": 0,
+    "min_segment_duration_sec": 1.0,
+    "total_walking_time_sec": 0,
+    "parameters": {},
+    "pd_assessment": {
+      "indicators": {},
+      "overall": {
+        "risk_level": "Unknown",
+        "confidence": "Insufficient data for analysis"
+      }
+    },
+    "reliability_score": 0,
+    "analysis_quality": "Insufficient Data"
+  },
+  "ml_inference": {
+    "hgb_mediapipe": {
+      "available": true,
+      "model_id": "hgb_mediapipe_runtime_v1",
+      "feature_names": [
+        "walking_speed",
+        "stride_length",
+        "cadence",
+        "step_width",
+        "asymmetry",
+        "stability_score",
+        "stride_time_cv",
+        "arm_swing_asymmetry",
+        "arm_swing_amplitude",
+        "step_time_asymmetry"
+      ],
+      "threshold": 0.05,
+      "prob_pd": null,
+      "pred_label": null,
+      "segments_evaluated": 0,
+      "error": "no_valid_segment_predictions",
+      "segment_results": []
+    },
+    "hgb_carepd_smpl_baseline": {
+      "available": false,
+      "model_id": "hgb_carepd_smpl_handcrafted_v1",
+      "reason": "feature_mismatch_smpl_vs_mediapipe",
+      "expected_input": {
+        "pose": "(T,72) axis-angle",
+        "trans": "(T,3)",
+        "fps": "float"
+      }
+    }
+  }
+}

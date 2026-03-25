@@ -246,10 +246,11 @@ class FOGDetector:
             loco_mask = (np.abs(freqs) >= self.LOCOMOTION_BAND[0]) & (np.abs(freqs) <= self.LOCOMOTION_BAND[1])
             loco_power = np.sum(fft_vals[loco_mask] ** 2)
 
-            # Freezing index = freeze / (freeze + locomotion)
-            total_power = freeze_power + loco_power
-            if total_power > 0:
-                fi = freeze_power / total_power
+            # Literature-style freezing index ratio.
+            # Moore et al. style definitions use freeze-band power relative to
+            # locomotor-band power rather than a normalized total-power fraction.
+            if loco_power > 1e-12:
+                fi = freeze_power / loco_power
             else:
                 fi = 0.0
 

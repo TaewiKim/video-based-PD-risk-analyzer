@@ -1,0 +1,508 @@
+{
+  "video_info": {
+    "path": "examples/Parkinson's Disease Freezing & Festinating Gait [EQ0HG16EC3g]_320.webm",
+    "fps": 23.976023976023978,
+    "analysis_fps": 30.0,
+    "total_frames": 460,
+    "duration": 19.18583333333333,
+    "resolution": "320x180"
+  },
+  "user": {
+    "identified": false,
+    "user_id": null,
+    "user_name": null,
+    "confidence": 0.0,
+    "height_cm": 170.0
+  },
+  "walking_detection": {
+    "total_segments": 3,
+    "segments_meeting_pose_quality": 3,
+    "excluded_low_quality_segments": 0,
+    "total_walking_time": 10.899999999999999,
+    "walking_ratio": 0.568695652173913,
+    "min_segment_duration_required": 1.0,
+    "min_pose_quality_required": 0.45,
+    "min_segment_quality_ratio_required": 0.6,
+    "segments": [
+      {
+        "start_time": 0.0,
+        "end_time": 5.366666666666666,
+        "duration": 5.366666666666666,
+        "confidence": 0.4744558572644645,
+        "pose_quality_mean": 0.6873871077407075,
+        "pose_quality_valid_ratio": 0.782608695652174,
+        "meets_pose_quality": true
+      },
+      {
+        "start_time": 13.333333333333334,
+        "end_time": 15.133333333333333,
+        "duration": 1.799999999999999,
+        "confidence": 0.3265500901253047,
+        "pose_quality_mean": 0.8277467892774001,
+        "pose_quality_valid_ratio": 1.0,
+        "meets_pose_quality": true
+      },
+      {
+        "start_time": 15.433333333333334,
+        "end_time": 19.166666666666668,
+        "duration": 3.7333333333333343,
+        "confidence": 0.5304106953302162,
+        "pose_quality_mean": 0.7185637015649112,
+        "pose_quality_valid_ratio": 0.8660714285714286,
+        "meets_pose_quality": true
+      }
+    ]
+  },
+  "preprocessing": {
+    "applied": true,
+    "target_fps": 30.0,
+    "source_fps": 23.976023976023978,
+    "detection_rate": 1.0,
+    "mean_pose_quality": 0.7734070154867468,
+    "checks": {
+      "detection_rate_ok": true,
+      "mean_pose_quality_ok": true
+    },
+    "normalization": {
+      "translation_alignment": "pelvis_center",
+      "scale_normalization": "shoulder_distance",
+      "smoothing_window": 5
+    },
+    "input_shape": [
+      460,
+      33,
+      3
+    ],
+    "output_shape": [
+      575,
+      33,
+      3
+    ]
+  },
+  "analysis_results": [
+    {
+      "segment_id": "seg_1",
+      "user_id": null,
+      "user_name": "Unknown",
+      "start_time": 0.0,
+      "end_time": 5.366666666666666,
+      "duration": 5.366666666666666,
+      "walking_speed": 0.433,
+      "stride_length": 0.4000000059604645,
+      "cadence": 130.0,
+      "step_width": 0.029999999329447746,
+      "asymmetry": 0.7269999980926514,
+      "stability_score": 0.233,
+      "classification": "Multiple literature cutoffs abnormal",
+      "risk_level": "High",
+      "confidence": 0.3261348394756582,
+      "percentile": 0,
+      "stride_time_cv": 11.44,
+      "arm_swing_asymmetry": 0.492000013589859,
+      "arm_swing_amplitude": 1.0,
+      "step_time_asymmetry": 0.308,
+      "pd_risk_score": 1.0,
+      "pd_risk_level": "High",
+      "hgb_pd_probability": 0.9998077076032968,
+      "hgb_predicted_label": "PD Risk"
+    },
+    {
+      "segment_id": "seg_2",
+      "user_id": null,
+      "user_name": "Unknown",
+      "start_time": 13.333333333333334,
+      "end_time": 15.133333333333333,
+      "duration": 1.799999999999999,
+      "walking_speed": 0.433,
+      "stride_length": 0.4000000059604645,
+      "cadence": 130.0,
+      "step_width": 0.029999999329447746,
+      "asymmetry": 0.12800000607967377,
+      "stability_score": 0,
+      "classification": "Multiple literature cutoffs abnormal",
+      "risk_level": "High",
+      "confidence": 0.2703007886394666,
+      "percentile": 0,
+      "stride_time_cv": 3.0,
+      "arm_swing_asymmetry": 0.3720000088214874,
+      "arm_swing_amplitude": 0.10000000149011612,
+      "step_time_asymmetry": 0.0,
+      "pd_risk_score": 0.667,
+      "pd_risk_level": "High",
+      "hgb_pd_probability": 0.9999880582267804,
+      "hgb_predicted_label": "PD Risk"
+    },
+    {
+      "segment_id": "seg_3",
+      "user_id": null,
+      "user_name": "Unknown",
+      "start_time": 15.433333333333334,
+      "end_time": 19.166666666666668,
+      "duration": 3.7333333333333343,
+      "walking_speed": 0.429,
+      "stride_length": 0.4000000059604645,
+      "cadence": 128.6,
+      "step_width": 0.029999999329447746,
+      "asymmetry": 0.8080000281333923,
+      "stability_score": 0,
+      "classification": "Multiple literature cutoffs abnormal",
+      "risk_level": "High",
+      "confidence": 0.38113387258609854,
+      "percentile": 93,
+      "stride_time_cv": 3.0,
+      "arm_swing_asymmetry": 0.5019999742507935,
+      "arm_swing_amplitude": 1.5,
+      "step_time_asymmetry": 0.05,
+      "pd_risk_score": 0.667,
+      "pd_risk_level": "High",
+      "hgb_pd_probability": 0.060839218521664525,
+      "hgb_predicted_label": "PD Risk"
+    }
+  ],
+  "summary": {
+    "n_segments": 3,
+    "total_duration": 10.9,
+    "avg_speed": 0.432,
+    "speed_std": 0.002,
+    "avg_stride_length": 0.4,
+    "stride_length_std": 0.0,
+    "avg_cadence": 129.5,
+    "cadence_std": 0.7,
+    "avg_step_width": 0.03,
+    "avg_asymmetry": 0.554,
+    "avg_stability": 0.078,
+    "avg_stride_time_cv": 5.81,
+    "stride_time_cv_std": 3.98,
+    "avg_arm_swing_asymmetry": 0.455,
+    "avg_arm_swing_amplitude": 0.9,
+    "avg_step_time_asymmetry": 0.119,
+    "avg_pd_risk_score": 0.778,
+    "pd_risk_score_std": 0.157,
+    "overall_classification": "Multiple literature cutoffs abnormal",
+    "overall_risk": "High",
+    "overall_pd_risk_level": "High",
+    "avg_percentile": 31
+  },
+  "statistical_analysis": {
+    "n_segments_total": 3,
+    "n_segments_analyzed": 3,
+    "min_segment_duration_sec": 1.0,
+    "total_walking_time_sec": 10.9,
+    "parameters": {
+      "walking_speed": {
+        "parameter": "walking_speed",
+        "n_segments": 3,
+        "mean": 0.4317,
+        "std": 0.0023,
+        "cv": 0.53,
+        "min": 0.429,
+        "max": 0.433,
+        "ci_95": [
+          0.4259,
+          0.4374
+        ],
+        "values": [
+          0.433,
+          0.433,
+          0.429
+        ]
+      },
+      "stride_length": {
+        "parameter": "stride_length",
+        "n_segments": 3,
+        "mean": 0.4,
+        "std": 0.0,
+        "cv": 0.0,
+        "min": 0.4,
+        "max": 0.4,
+        "ci_95": [
+          0.4,
+          0.4
+        ],
+        "values": [
+          0.4000000059604645,
+          0.4000000059604645,
+          0.4000000059604645
+        ]
+      },
+      "cadence": {
+        "parameter": "cadence",
+        "n_segments": 3,
+        "mean": 129.5333,
+        "std": 0.8083,
+        "cv": 0.62,
+        "min": 128.6,
+        "max": 130.0,
+        "ci_95": [
+          127.5254,
+          131.5412
+        ],
+        "values": [
+          130.0,
+          130.0,
+          128.6
+        ]
+      },
+      "step_width": {
+        "parameter": "step_width",
+        "n_segments": 3,
+        "mean": 0.03,
+        "std": 0.0,
+        "cv": 0.0,
+        "min": 0.03,
+        "max": 0.03,
+        "ci_95": [
+          0.03,
+          0.03
+        ],
+        "values": [
+          0.029999999329447746,
+          0.029999999329447746,
+          0.029999999329447746
+        ]
+      },
+      "asymmetry": {
+        "parameter": "asymmetry",
+        "n_segments": 3,
+        "mean": 0.5543,
+        "std": 0.3714,
+        "cv": 67.0,
+        "min": 0.128,
+        "max": 0.808,
+        "ci_95": [
+          -0.3684,
+          1.477
+        ],
+        "values": [
+          0.7269999980926514,
+          0.12800000607967377,
+          0.8080000281333923
+        ]
+      },
+      "stability_score": {
+        "parameter": "stability_score",
+        "n_segments": 3,
+        "mean": 0.0777,
+        "std": 0.1345,
+        "cv": 173.21,
+        "min": 0.0,
+        "max": 0.233,
+        "ci_95": [
+          -0.2565,
+          0.4118
+        ],
+        "values": [
+          0.233,
+          0,
+          0
+        ]
+      },
+      "stride_time_cv": {
+        "parameter": "stride_time_cv",
+        "n_segments": 3,
+        "mean": 5.8133,
+        "std": 4.8728,
+        "cv": 83.82,
+        "min": 3.0,
+        "max": 11.44,
+        "ci_95": [
+          -6.2915,
+          17.9181
+        ],
+        "values": [
+          11.44,
+          3.0,
+          3.0
+        ]
+      },
+      "arm_swing_asymmetry": {
+        "parameter": "arm_swing_asymmetry",
+        "n_segments": 3,
+        "mean": 0.4553,
+        "std": 0.0723,
+        "cv": 15.89,
+        "min": 0.372,
+        "max": 0.502,
+        "ci_95": [
+          0.2756,
+          0.635
+        ],
+        "values": [
+          0.492000013589859,
+          0.3720000088214874,
+          0.5019999742507935
+        ]
+      },
+      "arm_swing_amplitude": {
+        "parameter": "arm_swing_amplitude",
+        "n_segments": 3,
+        "mean": 0.8667,
+        "std": 0.7095,
+        "cv": 81.86,
+        "min": 0.1,
+        "max": 1.5,
+        "ci_95": [
+          -0.8957,
+          2.6291
+        ],
+        "values": [
+          1.0,
+          0.10000000149011612,
+          1.5
+        ]
+      },
+      "step_time_asymmetry": {
+        "parameter": "step_time_asymmetry",
+        "n_segments": 3,
+        "mean": 0.1193,
+        "std": 0.1653,
+        "cv": 138.51,
+        "min": 0.0,
+        "max": 0.308,
+        "ci_95": [
+          -0.2913,
+          0.5299
+        ],
+        "values": [
+          0.308,
+          0.0,
+          0.05
+        ]
+      },
+      "pd_risk_score": {
+        "parameter": "pd_risk_score",
+        "n_segments": 3,
+        "mean": 0.778,
+        "std": 0.1923,
+        "cv": 24.71,
+        "min": 0.667,
+        "max": 1.0,
+        "ci_95": [
+          0.3004,
+          1.2556
+        ],
+        "values": [
+          1.0,
+          0.667,
+          0.667
+        ]
+      }
+    },
+    "pd_assessment": {
+      "indicators": {
+        "stride_variability": {
+          "threshold": 2.6,
+          "mean": 5.813333333333333,
+          "std": 4.872836271960441,
+          "ci_95": [
+            -6.291463012878481,
+            17.918129679545146
+          ],
+          "abnormal_count": 3,
+          "abnormal_pct": 100.0,
+          "t_statistic": 1.142,
+          "p_value": 0.1858,
+          "statistically_abnormal": false
+        },
+        "arm_swing": {
+          "threshold": 0.1,
+          "mean": 0.45533332228660583,
+          "std": 0.07234176993370056,
+          "ci_95": [
+            0.27562640346176104,
+            0.6350402411114506
+          ],
+          "abnormal_count": 3,
+          "abnormal_pct": 100.0,
+          "t_statistic": 8.508,
+          "p_value": 0.0068,
+          "statistically_abnormal": true
+        },
+        "step_timing": {
+          "threshold": 0.05,
+          "mean": 0.11933333333333333,
+          "std": 0.16529166141500704,
+          "ci_95": [
+            -0.29127391622046417,
+            0.5299405828871309
+          ],
+          "abnormal_count": 1,
+          "abnormal_pct": 33.33333333333333,
+          "t_statistic": 0.727,
+          "p_value": 0.2715,
+          "statistically_abnormal": false
+        }
+      },
+      "arm_swing_amplitude": {
+        "mean": 0.8666666150093079,
+        "std": 0.7094599008560181,
+        "assessment": "Reduced (PD-like)"
+      },
+      "overall": {
+        "risk_score_mean": 0.778,
+        "risk_score_std": 0.192,
+        "risk_level": "High",
+        "n_abnormal_indicators": 1,
+        "confidence": "Strong evidence of PD-like gait patterns"
+      }
+    },
+    "reliability_score": 0.992,
+    "analysis_quality": "Poor"
+  },
+  "ml_inference": {
+    "hgb_mediapipe": {
+      "available": true,
+      "model_id": "hgb_mediapipe_runtime_v1",
+      "feature_names": [
+        "walking_speed",
+        "stride_length",
+        "cadence",
+        "step_width",
+        "asymmetry",
+        "stability_score",
+        "stride_time_cv",
+        "arm_swing_asymmetry",
+        "arm_swing_amplitude",
+        "step_time_asymmetry"
+      ],
+      "threshold": 0.05,
+      "prob_pd": 0.6868783281172472,
+      "pred_label": "PD Risk",
+      "segments_evaluated": 3,
+      "error": null,
+      "segment_results": [
+        {
+          "segment_id": "seg_1",
+          "available": true,
+          "prob_pd": 0.9998077076032968,
+          "pred_label": "PD Risk",
+          "error": null
+        },
+        {
+          "segment_id": "seg_2",
+          "available": true,
+          "prob_pd": 0.9999880582267804,
+          "pred_label": "PD Risk",
+          "error": null
+        },
+        {
+          "segment_id": "seg_3",
+          "available": true,
+          "prob_pd": 0.060839218521664525,
+          "pred_label": "PD Risk",
+          "error": null
+        }
+      ]
+    },
+    "hgb_carepd_smpl_baseline": {
+      "available": false,
+      "model_id": "hgb_carepd_smpl_handcrafted_v1",
+      "reason": "feature_mismatch_smpl_vs_mediapipe",
+      "expected_input": {
+        "pose": "(T,72) axis-angle",
+        "trans": "(T,3)",
+        "fps": "float"
+      }
+    }
+  }
+}

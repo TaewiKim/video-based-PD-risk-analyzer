@@ -19,6 +19,7 @@ RIGHT_SHOULDER = 12
 
 @dataclass
 class SkeletonPipelineConfig:
+    pose_backend: str = "auto"
     sample_rate: int = 1
     min_detection_rate: float = 0.3
     min_valid_frames: int = 45
@@ -145,7 +146,7 @@ def preprocess_video_to_skeleton(
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    with PoseExtractor() as extractor:
+    with PoseExtractor(backend=cfg.pose_backend) as extractor:
         sequence = extractor.extract_from_video(video_path, sample_rate=cfg.sample_rate)
 
     quality_checker = VideoQualityChecker(
@@ -171,6 +172,7 @@ def preprocess_video_to_skeleton(
         "label": label,
         "pipeline": "video->skeleton->validation->normalization",
         "config": {
+            "pose_backend": cfg.pose_backend,
             "sample_rate": cfg.sample_rate,
             "min_detection_rate": cfg.min_detection_rate,
             "min_valid_frames": cfg.min_valid_frames,

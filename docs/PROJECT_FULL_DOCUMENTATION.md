@@ -1,352 +1,496 @@
 # Research-Automation 통합 기술 문서
 
-최종 업데이트: 2026-02-13  
-대상 저장소: `research-automation`
+최종 업데이트: 2026-03-23  
+대상 저장소: `video-based-PD-risk-analyzer`
 
-이 문서는 프로젝트의 전체 범위를 한 번에 이해/운영할 수 있도록 아래를 통합 정리합니다.
+이 문서는 현재 저장소의 실제 코드 기준으로 아래를 정리합니다.
 
-- 프로젝트 개념과 목표
-- 문헌/데이터셋 근거
-- 아키텍처 설계
-- 분석 프로세스(파이프라인)
-- 분석 파라미터와 분석 모델
-- 평가 방법과 현재 결과
+- 저장소 목적과 구성
+- 전체 아키텍처
+- 웹 분석 시스템의 데이터 흐름
+- 코어 분석 파이프라인
+- 출력 구조와 산출물
+- 실행/운영 시 주의사항
 
----
-
-## 1. 프로젝트 개념
-
-본 프로젝트는 **비디오 기반 신경계/운동 증상 분석 자동화**를 목표로 합니다.
-
-- 입력: 일반 영상(`.mp4`, `.mov` 등)
-- 처리: 얼굴 인식 + 자세/활동 분석 + 증상/위험도 추정
-- 출력: 증상별 정량 지표, 중증도(severity), 통합 리포트
-
-핵심 도메인:
-
-- Parkinson’s Disease(PD) 운동증상: tremor, bradykinesia, posture, FOG, gait
-- 임상 척도 연계: MDS-UPDRS 기반 해석(일부 모듈)
+모델 정의, 임계값, 수식, 레퍼런스는 별도 문서 [`docs/MODELS_AND_FORMULAS.md`](/workspace/video-based-PD-risk-analyzer/docs/MODELS_AND_FORMULAS.md)에 분리했습니다.
 
 ---
 
-## 2. 문헌/데이터 근거
+## 1. 프로젝트 개요
 
-### 2.1 핵심 데이터셋/논문 축
+이 저장소는 두 개의 층으로 구성됩니다.
 
-코드상 문헌 카탈로그는 `scripts/download_all_papers.py`에서 관리합니다.
+1. 연구 자동화 툴킷
+2. 비디오 기반 Parkinson's Disease(PD) 위험/증상 분석 웹 데모
 
-- CARE-PD: 멀티사이트 PD gait 익명화 데이터셋
-- 3DGait: 비디오 기반 보행 분석(인지질환 포함)
-- BMCLab: PD full-body kinematics/kinetics 공개 데이터
-- PD-GaM, T-SDU-PD, DNE, E-LC, KUL-DT-T, T-LTC, T-SDU 관련 논문
-- 임상척도 원문: MDS-UPDRS(Goetz 2008), Hoehn & Yahr, House-Brackmann
+연구 자동화 툴킷은 문헌 수집, 데이터 수집, 실험 추적, 리포트 생성을 담당합니다.  
+웹 데모는 업로드된 비디오를 기반으로 보행, 떨림, 서동, 자세, FOG(Freezing of Gait) 관련 지표를 계산하고 화면에 시각화합니다.
 
-로컬 PDF 예시:
+입력과 출력은 다음과 같습니다.
 
-- `data/papers/goetz_2008_mds_updrs.pdf`
-- `data/papers/Video-based gait analysis for assessing Alzheimerâ__s Disease and Dementia with Lewy Bodies.pdf`
-- `data/papers/pmid_36875659.pdf`
-
-### 2.2 데이터 위치
-
-- CARE-PD 데이터: `data/datasets/CARE-PD`
-- CARE-PD 공식 코드: `data/datasets/CARE-PD-code`
-- 웹 분석 결과 JSON: `web/results/*.json`
+- 입력: 일반 비디오 파일 (`mp4`, `avi`, `mov`, `webm`, `mkv`)
+- 중간표현: 얼굴/자세/손/얼굴 랜드마크, 사람별 track, activity segment, walking segment
+- 출력: gait biomarker, symptom summary, person-level aggregation, 웹 시각화용 JSON
 
 ---
 
-## 3. 아키텍처 설계
+## 2. 저장소 구조
 
-### 3.1 레이어 구조
+### 2.1 최상위 디렉터리
 
-- `src/research_automation/literature/*`: 문헌 검색/다운로드/요약
-- `src/research_automation/collection/*`: 데이터/영상 수집 및 품질 확인
-- `src/research_automation/pipeline/*`: CARE-PD baseline 및 official adapter
-- `src/research_automation/analysis/*`: 분석 핵심 로직(얼굴/행동/위험)
-- `web/*`: Flask UI/API 및 실시간 분석 통합
+- `src/research_automation/`: 연구 자동화 및 코어 분석 패키지
+- `server/`: Django 서비스, 내장 UI, 분석 서비스 모듈, 런타임 데이터
+- `docs/`: 재현성/프로젝트 문서
+- `config/`: 설정 파일
+- `tests/`: 패키지 단위 테스트
 
-### 3.2 분석 파이프라인(요구 순서 반영)
+### 2.2 `src/research_automation/` 내부 역할
 
-순서 고정 파이프라인은 `src/research_automation/analysis/video_pipeline.py`에 구현되어 있습니다.
+- `analysis/`: 얼굴 인식, 행동 분석, risk analysis, ordered video pipeline
+- `pipeline/`: CARE-PD baseline, sequence model, official adapter, extractor
+- `collection/`: dataset, youtube, quality, questionnaire, ecg
+- `literature/`: 논문 검색/다운로드/요약
+- `report/`, `submission/`, `experiment/`: 리포트/제출/실험 추적
 
-1. 얼굴 인식 (`face_recognition`)
-2. 행동 분석(인물별) (`behavior_analysis_per_person`)
-3. 위험 분석(행동별) (`risk_analysis_per_action`)
+### 2.3 `server/` 내부 역할
 
-`OrderedVideoAnalysisPipeline.STAGE_ORDER`:
+- [`server/webapp/views.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/views.py): Django API 엔드포인트와 웹 오케스트레이션
+- [`server/webapp/templates/webapp/index.html`](/workspace/video-based-PD-risk-analyzer/server/webapp/templates/webapp/index.html): 단일 페이지 UI
+- [`server/webapp/services/smart_analyzer.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/services/smart_analyzer.py): gait 분석, walking detection, face registration/identification, statistical summary
+- [`server/webapp/services/pd_symptoms_analyzer.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/services/pd_symptoms_analyzer.py): multi-person PD symptom 분석기
+- `server/runtime/data/`: 등록 사용자/모델/프로필 저장
+- `server/runtime/uploads/`: 업로드 비디오 저장
+- `server/runtime/results/`: JSON 결과 저장
 
-- `face_recognition`
-- `behavior_analysis_per_person`
-- `risk_analysis_per_action`
+---
 
-### 3.3 웹 서비스 아키텍처
+## 3. 전체 아키텍처
 
-- 엔트리: `web/app.py`
-- 주요 API:
+### 3.1 시스템 관점
+
+전체 시스템은 아래 세 레이어로 나눌 수 있습니다.
+
+1. Interface Layer
+2. Analysis Orchestration Layer
+3. Domain Analysis / ML Layer
+
+### 3.2 Interface Layer
+
+웹 인터페이스는 Django + 템플릿 기반입니다.
+
+- 엔트리포인트: [`server/webapp/views.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/views.py)
+- 주요 엔드포인트:
+  - `GET /`
   - `POST /upload`
   - `POST /analyze`
   - `POST /analyze-symptoms`
+  - `POST /register-user`
+  - `GET /users`
+  - `GET /users/<user_id>/photo`
+  - `GET /videos/<filename>`
   - `GET /reference-data`
-- 템플릿/UI: `web/templates/index.html`
+
+프런트엔드는 [`server/webapp/templates/webapp/index.html`](/workspace/video-based-PD-risk-analyzer/server/webapp/templates/webapp/index.html) 안에서 업로드, 결과 렌더링, person tab, timeline, chart, statistics table을 모두 처리합니다.
+
+### 3.3 Analysis Orchestration Layer
+
+웹 분석은 두 개의 분석기를 조합합니다.
+
+1. `SmartGaitAnalyzer`
+2. `PDSymptomsAnalyzer`
+
+`/analyze`는 gait 중심 결과를 반환하고, `/analyze-symptoms`는 multi-person symptom 결과를 반환합니다.  
+`/analyze-symptoms` 내부에서는 symptom 분석 결과에 gait 분석 결과를 덧붙여 최종 응답을 풍부하게 만듭니다.
+
+### 3.4 Domain Analysis / ML Layer
+
+도메인 분석은 다음 모듈들로 구성됩니다.
+
+- face registration / identification
+- walking detection
+- gait parameter estimation
+- literature-cutoff gait biomarker summary
+- segment-level statistical aggregation
+- multi-person tracking
+- activity segmentation
+- symptom-specific analyzers
+- CARE-PD 재현용 분류기 및 sequence model
 
 ---
 
-## 4. 분석 프로세스
+## 4. 핵심 실행 경로
 
-## 4.1 코어(Ordered Pipeline)
+### 4.1 웹 실분석 경로
 
-파일: `src/research_automation/analysis/video_pipeline.py`
+실분석 서버의 메인 흐름은 다음과 같습니다.
+
+1. `POST /upload`
+2. 업로드 파일 저장
+3. `POST /analyze` 또는 `POST /analyze-symptoms`
+4. 분석 결과 JSON 생성
+5. `server/runtime/results/*.json` 저장
+6. 프런트가 JSON을 받아 카드/차트/타임라인을 렌더링
+
+### 4.2 `/analyze` 경로
+
+[`server/webapp/views.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/views.py)의 `/analyze`는 아래 순서입니다.
+
+1. 파일 존재 확인
+2. `analyzer.analyze_video(...)` 호출
+3. 결과를 `*_results.json`으로 저장
+4. JSON 응답 반환
+
+이 경로는 gait 중심 결과를 반환합니다.
+
+- `video_info`
+- `user`
+- `walking_detection`
+- `preprocessing`
+- `analysis_results`
+- `summary`
+- `statistical_analysis`
+- `ml_inference`
+
+### 4.3 `/analyze-symptoms` 경로
+
+[`server/webapp/views.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/views.py)의 `/analyze-symptoms`는 아래 순서입니다.
+
+1. `pd_symptoms_analyzer.analyze_video(...)`
+2. 같은 비디오에 대해 `analyzer.analyze_video(...)` 재실행
+3. gait 결과에서 walking segment 추출
+4. standing-walking 경계로부터 FOG transition 유도
+5. symptom 결과에 `gait_analysis` 블록 병합
+6. `persons[*].symptoms.fog` 내부 transition 정보 보강
+7. 결과를 `*_symptoms.json`으로 저장
+8. JSON 응답 반환
+
+즉, symptom 분석 응답은 multi-person symptom 결과를 기본으로 하고, 그 위에 single-video gait summary를 결합한 형태입니다.
+
+---
+
+## 5. 웹 분석 프로세스 상세
+
+### 5.1 Smart Gait Analyzer
+
+[`server/webapp/services/smart_analyzer.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/services/smart_analyzer.py)는 아래 역할을 담당합니다.
+
+1. 비디오 읽기
+2. 공용 pose extractor 기반 keypoint 추출
+   - 기본 경로는 RTMW whole-body ONNX 추론
+   - 필요 시 MediaPipe fallback 가능
+3. 얼굴 인식 기반 사용자 식별
+4. 걷기 구간 탐지
+5. 걷기 구간별 gait parameter 추정
+6. 문헌 cutoff 기반 gait indicator 계산
+7. segment-level summary / statistical summary 계산
+8. optional runtime ML inference 요약
+
+현재 `/analyze`의 rule summary는 예전 speed/stride heuristic 대신 아래 biomarker를 기준으로 구성됩니다.
+
+- stride time CV
+- arm swing asymmetry
+- step time asymmetry
+
+runtime HGB 모델은 별도 확률값으로 병기되며, literature cutoff와 같은 스케일로 취급하지 않습니다.
+세션 classification/risk summary는 literature cutoff abnormal count를 기준으로 유지하고, runtime HGB는 보조 신호로만 노출합니다.
+
+#### 5.1.1 세부 구성 요소
+
+- `FaceRecognizer`
+- `WalkingDetector`
+- `GaitEstimator`
+- `GaitStatisticalAnalyzer`
+- `SmartGaitAnalyzer`
+
+#### 5.1.2 출력 구조
+
+segment 단위 결과는 `GaitAnalysisResult` dataclass로 표현됩니다.
+
+- 시간 구간
+- 보행 속도
+- stride length
+- cadence
+- step width
+- asymmetry
+- stability score
+- PD-specific biomarker
+- risk/classification
+- optional HGB probability
+
+session 단위 결과는 아래 블록으로 요약됩니다.
+
+- `walking_detection`
+- `analysis_results`
+- `summary`
+- `statistical_analysis`
+- `ml_inference`
+
+### 5.2 PD Symptoms Analyzer
+
+[`server/webapp/services/pd_symptoms_analyzer.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/services/pd_symptoms_analyzer.py)는 multi-person symptom 분석 경로입니다.
+
+핵심 클래스는 다음과 같습니다.
+
+- `MultiPersonTracker`
+- `UnifiedActivityDetector`
+- `TremorSegmentDetector`
+- `BradykinesiaSegmentDetector`
+- `PostureSegmentDetector`
+- `FOGSegmentDetector`
+- `TremorAnalyzer`
+- `BradykinesiaAnalyzer`
+- `PostureAnalyzer`
+- `FOGTransitionDetector`
+- `FOGTransitionAnalyzer`
+- `SymptomStatisticalAggregator`
+- `GaitAnalyzer`
+- `PDSymptomsAnalyzer`
+
+#### 5.2.1 단계별 흐름
+
+1. 비디오 메타데이터 로드
+2. multi-person pose track 추출
+3. 사람별 activity segmentation
+4. activity type별 symptom analysis segment 생성
+5. symptom analyzer 실행
+6. 사람별 symptom summary 집계
+7. 사람별 skeleton track payload 생성
+8. 전체 `activity_summary` 및 `persons[]` 응답 조립
+
+#### 5.2.2 activity segmentation
+
+activity segmentation은 다음 구분을 사용합니다.
+
+- `walking`
+- `resting`
+- `task`
+- `standing`
+
+그리고 activity에 따라 증상 분석을 매핑합니다.
+
+- `walking` -> gait, FOG
+- `resting` -> tremor
+- `task` -> bradykinesia
+- `standing` -> posture
+
+#### 5.2.3 symptom aggregation
+
+각 symptom은 segment-level `SymptomResult` 목록을 만들고, 이후 `PersonSymptomSummary`로 통계 요약됩니다.
+
+사람별 응답에는 아래 정보가 포함됩니다.
+
+- `person_id`
+- `duration`
+- `activity_breakdown`
+- `activity_segments`
+- `track_quality`
+- `skeleton_track`
+- `symptoms`
+
+최상위 응답은 아래 구조입니다.
+
+- `video_info`
+- `n_persons`
+- `activity_summary`
+- `persons`
+- `analyzed_symptoms`
+
+---
+
+## 6. 코어 패키지 분석 파이프라인
+
+웹 경로와 별도로, 패키지 내부에는 ordered pipeline이 존재합니다.
+
+파일: [`src/research_automation/analysis/video_pipeline.py`](/workspace/video-based-PD-risk-analyzer/src/research_automation/analysis/video_pipeline.py)
+
+이 파이프라인은 아래 순서를 강제합니다.
+
+1. `face_recognition`
+2. `behavior_analysis_per_person`
+3. `risk_analysis_per_action`
+
+실행 흐름은 다음과 같습니다.
 
 1. `FaceRecognitionAnalyzer.analyze_video()`
-2. `PoseExtractor.extract_from_video()`로 포즈 공통 추출
+2. `PoseExtractor.extract_from_video()`
 3. `BehaviorAnalyzer.analyze_person()`
-   - Walking detection
-   - Tremor analysis
-   - Bradykinesia analysis
 4. `ActionRiskAnalyzer.analyze_person()`
-   - Walking risk
-   - Tremor risk
-   - Bradykinesia risk
-   - + FOG feature 병합
 
-## 4.2 웹 통합 증상 분석
+이 경로는 `src/research_automation/analysis/*` 기반의 보다 패키지화된 분석 API이며, 웹 서비스는 별도의 `server/webapp/services/*` 구현을 사용합니다.
 
-파일: `web/pd_symptoms_analyzer.py`, `web/app.py`
+즉, 저장소에는 현재 두 개의 분석 축이 공존합니다.
 
-1. 멀티인물 트래킹
-2. Activity segmentation
-   - walking/resting/task/standing
-3. 활동별 증상 분석 매핑
-   - walking -> gait
-   - resting -> tremor
-   - task -> bradykinesia
-   - standing -> posture
-4. standing↔walking 전이 구간 FOG 분석
-5. 인물별 통계 집계 + skeleton overlay payload 생성
-6. `web/app.py`에서 gait analyzer 결과와 통합 반환
+- 패키지형 ordered pipeline
+- Django 서비스용 analyzer stack
 
 ---
 
-## 5. 분석 파라미터(주요 기본값)
+## 7. ML / 분석 구성요소 맵
 
-## 5.1 얼굴 인식
+### 7.1 CARE-PD handcrafted baseline
 
-파일: `src/research_automation/analysis/face_analysis/recognition.py`
+파일: [`src/research_automation/pipeline/gait_baseline.py`](/workspace/video-based-PD-risk-analyzer/src/research_automation/pipeline/gait_baseline.py)
 
-- `detection_threshold=0.05`
-- `match_threshold=0.90`
-- 얼굴이 검출되었지만 등록 프로파일이 없으면 기본 `person_1` 할당
+역할:
 
-## 5.2 보행 검출
+- CARE-PD `.pkl` 로드
+- domain normalization
+- handcrafted gait feature extraction
+- classical ML classifier 학습/평가
 
-파일: `src/research_automation/analysis/behavior_analysis/walking_detection.py`
+지원 classifier:
 
-- `min_walking_duration=1.0` sec
-- `speed_threshold=0.01`
-- `rhythm_threshold=0.3`
-- `smoothing_window=0.5` sec
-- confidence 결합식:
-  - `0.35*speed + 0.30*rhythm + 0.20*progression + 0.15*oscillation`
-- 걷기 판정 threshold: `walking_confidence > 0.4`
+- RandomForest
+- GradientBoosting
+- HistGradientBoosting
+- ExtraTrees
+- SVC
+- LogisticRegression
+- optional XGBoost
 
-## 5.3 떨림(Tremor)
+### 7.2 Sequence model
 
-파일: `src/research_automation/analysis/behavior_analysis/tremor.py`
+파일: [`src/research_automation/pipeline/gait_sequence_model.py`](/workspace/video-based-PD-risk-analyzer/src/research_automation/pipeline/gait_sequence_model.py)
 
-- 주파수 탐색 범위: `3.0~12.0 Hz`
-- `amplitude_threshold=0.01`
-- `window_size=64`
-- PD rest/postural/action frequency rules:
-  - rest: `3~6Hz`
-  - postural: `4~8Hz`
-  - action: `>8Hz`
+역할:
 
-## 5.4 Bradykinesia
+- walk당 fixed-length sequence 생성
+- 1D temporal CNN 학습
+- stratified CV로 OOF probability 산출
+- binary task에서 threshold 최적화
 
-파일: `src/research_automation/analysis/behavior_analysis/bradykinesia.py`
+### 7.3 Self-supervised + fine-tune model
 
-- `pause_threshold=0.02`
-- `min_pause_duration=0.1` sec
-- 점수(`0~4` 유사 스케일) 구성:
-  - speed decrement
-  - amplitude decrement
-  - hesitation
-  - irregularity
+파일: [`src/research_automation/pipeline/gait_sequence_ssl.py`](/workspace/video-based-PD-risk-analyzer/src/research_automation/pipeline/gait_sequence_ssl.py)
 
-## 5.5 FOG (코어 리스크 모듈)
+역할:
 
-파일: `src/research_automation/analysis/risk_analysis/fog.py`
+1. temporal order verification으로 encoder 사전학습
+2. supervised classifier fine-tuning
 
-- Freeze band: `3~8 Hz`
-- Locomotion band: `0.5~3 Hz`
-- `min_episode_duration=0.5` sec
-- `movement_threshold=0.02`
-- `window_size=1.0` sec
+### 7.4 CARE-PD official adapter
 
-## 5.6 FOG Transition (웹 증상 모듈)
+파일: [`src/research_automation/pipeline/carepd_official.py`](/workspace/video-based-PD-risk-analyzer/src/research_automation/pipeline/carepd_official.py)
 
-파일: `web/pd_symptoms_analyzer.py`
+역할:
 
-- 전이 윈도우: `transition_window=2.0` sec
-- `HESITATION_VELOCITY_THRESHOLD=15.0 px/s`
-- Freeze Index 기준:
-  - mild `>2.0`
-  - moderate `>3.0`
-  - severe `>5.0`
+- official code wrapper
+- experiment 실행/평가 어댑트
+- CARE-PD reproducibility 지원
 
-## 5.7 웹 Gait PD indicator
-
-파일: `web/smart_analyzer.py`
-
-- 주요 PD threshold:
-  - `walking_speed < 0.55 m/s`
-  - `stride_length < 0.60 m`
-  - `asymmetry < 0.05` (현재 코드 정의 기준)
-- 가중치 예:
-  - speed `0.35`
-  - stride_length `0.35`
-  - asymmetry `0.15`
+자세한 재현 절차는 [`docs/CAREPD_REPRO.md`](/workspace/video-based-PD-risk-analyzer/docs/CAREPD_REPRO.md)를 참고합니다.
 
 ---
 
-## 6. 분석 모델
+## 8. 데이터 흐름
 
-## 6.1 RF baseline (핸드크래프트)
+### 8.1 비디오 -> gait 결과
 
-파일: `src/research_automation/pipeline/gait_baseline.py`
-
-- 입력: CARE-PD `.pkl`(SMPL pose/trans/fps)
-- 특징: duration/speed/pose variability/symmetry/frequency/accel/jerk
-- 모델: `RandomForestClassifier`
-  - `n_estimators=200`
-  - `max_depth=10`
-  - `min_samples_leaf=5`
-  - `class_weight='balanced'`
-
-## 6.2 CARE-PD official adapter
-
-파일: `src/research_automation/pipeline/carepd_official.py`
-
-- official code 실행 어댑터
-- `run.py` / `eval_only.py` 기반
-- 환경 변수 기본 주입:
-  - `WANDB_MODE=disabled`
-  - `WANDB_SILENT=true`
-  - `OMP_NUM_THREADS=1`
-  - `KMP_DUPLICATE_LIB_OK=TRUE`
-
-## 6.3 공식 백본(문헌 코드)
-
-CARE-PD 공식 코드 기준 지원 백본:
-
-- `potr`
-- `motionbert`
-- `mixste`
-- `motionagformer`
-- `poseformerv2`
-- `momask`
-- `motionclip`
-
----
-
-## 7. 평가 방법
-
-## 7.1 RF 평가 프로토콜
-
-파일: `src/research_automation/pipeline/gait_baseline.py`
-
-- Within-dataset LOSO (subject-wise `LeaveOneGroupOut`)
-- LODO (Leave-One-Dataset-Out)
-- 지표:
-  - Macro-F1
-  - Accuracy
-  - Balanced Accuracy
-
-실행:
-
-```bash
-./web/.venv312/bin/python src/research_automation/pipeline/gait_baseline.py data/datasets/CARE-PD --protocol literature --method rf
+```text
+video file
+-> frame decode
+-> pose landmarks
+-> walking segmentation
+-> per-segment gait parameter estimation
+-> PD indicator scoring
+-> multi-segment statistical aggregation
+-> JSON response / saved result
 ```
 
-## 7.2 Official 평가 프로토콜
+### 8.2 비디오 -> multi-symptom 결과
 
-- within(LOSO): `--num_folds -1`
-- LODO: `--cross_dataset_test 1 --force_LODO 1`
-- tuned hyperparams JSON 사용 가능:
-  - `configs/best_configs_augmented/.../best_params.json`
+```text
+video file
+-> multi-person tracking
+-> pose landmark extraction / person tracking
+-> activity segmentation
+-> symptom-specific segment extraction
+-> symptom analyzers
+-> per-person statistical aggregation
+-> gait integration + FOG transition enrichment
+-> JSON response / saved result
+```
 
----
+### 8.3 CARE-PD training/evaluation 흐름
 
-## 8. 현재 평가 결과
-
-## 8.1 RF 최신 실행 결과 (2026-02-13)
-
-### Within (LOSO)
-
-| Dataset | Macro-F1 | Acc | BalAcc |
-|---|---:|---:|---:|
-| 3DGait | 0.504 | 0.578 | 0.507 |
-| BMCLab | 0.633 | 0.661 | 0.630 |
-| PD-GaM | 0.661 | 0.694 | 0.628 |
-| T-SDU-PD | 0.398 | 0.399 | 0.406 |
-| **Mean** | **0.549** | - | - |
-
-### LODO
-
-| Test Dataset | Macro-F1 | Acc | BalAcc |
-|---|---:|---:|---:|
-| 3DGait | 0.139 | 0.200 | 0.271 |
-| BMCLab | 0.140 | 0.230 | 0.328 |
-| PD-GaM | 0.463 | 0.565 | 0.576 |
-| T-SDU-PD | 0.274 | 0.394 | 0.441 |
-| **Mean** | **0.254** | - | - |
-
-## 8.2 웹 실분석 예시 결과 (`parkinson_gait.mp4`)
-
-파일: `web/results/parkinson_gait_symptoms.json`
-
-- 비디오 길이: `~19.19s`
-- gait classification: `Mild Reduction`
-- gait PD risk score: `28.5%`
-- biomarkers:
-  - stride_cv: `1.75`
-  - arm_swing_asymmetry: `0.112`
-  - step_time_asymmetry: `0.191`
-  - walk_ratio: `0.313`
-- gait_metrics:
-  - speed: `0.783 m/s`
-  - stride_length: `0.842 m`
-  - cadence: `111.6 spm`
-  - step_count: `11`
-
-## 8.3 Official 실행 상태
-
-현재 문헌 코드 직접 실행(LODO, POTR, BMCLab target) 진행 중.
-
-- 프로세스 예: `eval_only.py --backbone potr --config BMCLab.json ...`
-- 상태 확인 시점: CPU 100% 근접 장시간 학습
-
-완료 후 `experiment_outs` 리포트를 수집해 RF와 동일 표 형식으로 추가해야 합니다.
+```text
+CARE-PD .pkl
+-> pose/trans/fps load
+-> domain normalization
+-> handcrafted or sequence feature build
+-> cross-validation
+-> metrics + optional threshold tuning
+-> report / calibration metadata
+```
 
 ---
 
-## 9. 리스크/제약 사항
+## 9. 산출물과 저장 위치
 
-- official 코드는 GPU 전제를 강하게 가지는 구간이 있어 CPU 재현 시 시간이 매우 김
-- OpenMP/환경 이슈(특히 macOS)로 환경변수 우회가 필요
-- 데이터셋 전처리 누락 시 LODO가 중간에 중단됨
-- 웹 분석 모듈과 코어 분석 모듈이 병렬 발전 중이라 지표 정의가 완전히 동일하지는 않음
+### 9.1 웹 산출물
+
+- 업로드 파일: `server/runtime/uploads/`
+- gait 결과: `server/runtime/results/*_results.json`
+- symptom 결과: `server/runtime/results/*_symptoms.json`
+- 사용자 프로필: `server/runtime/data/profiles/`
+
+### 9.2 모델/데이터 관련 경로
+
+- CARE-PD dataset: `data/datasets/CARE-PD` 또는 외부 연결 경로
+- CARE-PD official code: `data/datasets/CARE-PD-code`
+
+### 9.3 문서
+
+- 아키텍처/프로세스: [`docs/PROJECT_FULL_DOCUMENTATION.md`](/workspace/video-based-PD-risk-analyzer/docs/PROJECT_FULL_DOCUMENTATION.md)
+- 모델/수식/레퍼런스: [`docs/MODELS_AND_FORMULAS.md`](/workspace/video-based-PD-risk-analyzer/docs/MODELS_AND_FORMULAS.md)
+- CARE-PD 재현: [`docs/CAREPD_REPRO.md`](/workspace/video-based-PD-risk-analyzer/docs/CAREPD_REPRO.md)
+- 실험 노트: [`docs/RESEARCH_NOTE_PD_RISK_2026-02-15.md`](/workspace/video-based-PD-risk-analyzer/docs/RESEARCH_NOTE_PD_RISK_2026-02-15.md)
 
 ---
 
-## 10. 운영 가이드(실무)
+## 10. 실행과 의존성 메모
 
-1. 데이터/전처리 먼저 검증
-2. RF baseline으로 빠른 smoke benchmark 확보
-3. official 실험은 장시간 batch 실행 + 중간 로그 저장
-4. 결과표는 반드시 protocol별(LOSO/LODO)로 분리
+### 10.1 기본 패키지
 
-관련 문서:
+프로젝트 의존성은 [`pyproject.toml`](/workspace/video-based-PD-risk-analyzer/pyproject.toml)에 정의되어 있습니다.
 
-- 재현 가이드: `docs/CAREPD_REPRO.md`
+현재 코드 기준으로 주로 필요한 런타임은 다음과 같습니다.
 
+- `numpy`
+- `scipy`
+- `opencv-python`
+- `jinja2`
+- `django`
+- `mediapipe` (optional extra)
+
+### 10.2 웹 런타임 주의
+
+웹 서비스 레이어는 Django를 사용합니다.
+
+- [`server/webapp/views.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/views.py)
+- [`server/config/settings.py`](/workspace/video-based-PD-risk-analyzer/server/config/settings.py)
+
+## 11. 현재 아키텍처 해석
+
+현재 저장소는 완전히 단일한 production architecture라기보다, 아래가 함께 존재하는 연구/데모형 구조입니다.
+
+1. 재사용 가능한 Python 패키지 레이어
+2. CARE-PD 실험용 모델링/재현 레이어
+3. Django 기반 서비스 웹/API 레이어
+
+이 구조의 장점은 실험과 데모를 빠르게 병행할 수 있다는 점입니다.  
+반면, 패키지형 분석 코드와 웹 분석 코드가 일부 중복되어 있어 장기적으로는 공통 feature extraction / scoring layer를 통합하는 리팩터링 여지가 있습니다.
+
+---
+
+## 12. 권장 읽기 순서
+
+처음 읽는 경우 아래 순서를 권장합니다.
+
+1. [`README.md`](/workspace/video-based-PD-risk-analyzer/README.md)
+2. [`docs/PROJECT_FULL_DOCUMENTATION.md`](/workspace/video-based-PD-risk-analyzer/docs/PROJECT_FULL_DOCUMENTATION.md)
+3. [`docs/MODELS_AND_FORMULAS.md`](/workspace/video-based-PD-risk-analyzer/docs/MODELS_AND_FORMULAS.md)
+4. [`server/webapp/views.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/views.py)
+5. [`server/webapp/services/smart_analyzer.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/services/smart_analyzer.py)
+6. [`server/webapp/services/pd_symptoms_analyzer.py`](/workspace/video-based-PD-risk-analyzer/server/webapp/services/pd_symptoms_analyzer.py)
+7. [`src/research_automation/pipeline/gait_baseline.py`](/workspace/video-based-PD-risk-analyzer/src/research_automation/pipeline/gait_baseline.py)

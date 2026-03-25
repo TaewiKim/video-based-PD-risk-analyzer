@@ -1,0 +1,242 @@
+{
+  "video_info": {
+    "fps": 23.976023976023978,
+    "total_frames": 460,
+    "duration": 19.18583333333333,
+    "width": 2560,
+    "height": 1440,
+    "pose_backend": "mediapipe"
+  },
+  "n_persons": 0,
+  "activity_summary": {
+    "walking": 0,
+    "resting": 0,
+    "task": 0,
+    "standing": 0
+  },
+  "persons": [],
+  "activity_segments": [],
+  "analyzed_symptoms": [
+    "tremor",
+    "bradykinesia",
+    "posture",
+    "fog",
+    "fog_transition",
+    "gait"
+  ],
+  "error": "No persons detected in video",
+  "gait_analysis": {
+    "success": true,
+    "video_info": {
+      "path": "/workspace/video-based-PD-risk-analyzer/server/runtime/uploads/13dc931629634ba2b40209f1e8c548e2.webm",
+      "fps": 23.976023976023978,
+      "analysis_fps": 30.0,
+      "total_frames": 460,
+      "duration": 19.18583333333333,
+      "resolution": "2560x1440"
+    },
+    "user": {
+      "identified": false,
+      "user_id": null,
+      "user_name": null,
+      "confidence": 0.0,
+      "height_cm": 170.0
+    },
+    "pose_backend": null,
+    "walking_detection": {
+      "total_segments": 0,
+      "segments_meeting_pose_quality": 0,
+      "excluded_low_quality_segments": 0,
+      "total_walking_time": 0,
+      "walking_ratio": 0.0,
+      "min_segment_duration_required": 1.0,
+      "min_pose_quality_required": 0.45,
+      "min_segment_quality_ratio_required": 0.6,
+      "segments": []
+    },
+    "analysis_results": [],
+    "statistical_analysis": {
+      "n_segments_total": 0,
+      "n_segments_analyzed": 0,
+      "min_segment_duration_sec": 1.0,
+      "total_walking_time_sec": 0,
+      "parameters": {},
+      "pd_assessment": {
+        "indicators": {},
+        "overall": {
+          "risk_level": "Unknown",
+          "confidence": "Insufficient data for analysis"
+        }
+      },
+      "reliability_score": 0,
+      "analysis_quality": "Insufficient Data"
+    },
+    "preprocessing": {
+      "applied": true,
+      "target_fps": 30.0,
+      "source_fps": 23.976023976023978,
+      "detection_rate": 0.0,
+      "mean_pose_quality": 0.0,
+      "checks": {
+        "detection_rate_ok": false,
+        "mean_pose_quality_ok": false
+      },
+      "normalization": {
+        "translation_alignment": "pelvis_center",
+        "scale_normalization": "shoulder_distance",
+        "smoothing_window": 5
+      },
+      "input_shape": [
+        460,
+        33,
+        3
+      ],
+      "output_shape": [
+        575,
+        33,
+        3
+      ]
+    },
+    "ml_inference": {
+      "hgb_mediapipe": {
+        "available": true,
+        "model_id": "hgb_mediapipe_runtime_v1",
+        "feature_names": [
+          "walking_speed",
+          "stride_length",
+          "cadence",
+          "step_width",
+          "asymmetry",
+          "stability_score",
+          "stride_time_cv",
+          "arm_swing_asymmetry",
+          "arm_swing_amplitude",
+          "step_time_asymmetry"
+        ],
+        "threshold": 0.05,
+        "prob_pd": null,
+        "pred_label": null,
+        "segments_evaluated": 0,
+        "error": "no_valid_segment_predictions",
+        "segment_results": []
+      },
+      "hgb_carepd_smpl_baseline": {
+        "available": false,
+        "model_id": "hgb_carepd_smpl_handcrafted_v1",
+        "reason": "feature_mismatch_smpl_vs_mediapipe",
+        "expected_input": {
+          "pose": "(T,72) axis-angle",
+          "trans": "(T,3)",
+          "fps": "float"
+        }
+      }
+    },
+    "summary": {},
+    "turn_detection": {
+      "segments": [],
+      "summary": {
+        "total_segments": 0,
+        "total_turn_time": 0.0,
+        "possible_fog_turns": 0,
+        "hesitant_turns": 0,
+        "normal_turns": 0,
+        "turning_while_walking": 0,
+        "turning_in_place": 0
+      }
+    },
+    "turn_analysis": [],
+    "turn_methodology": {
+      "purpose": "screening",
+      "scope": "turn-focused freezing-of-gait risk heuristics from monocular pose",
+      "direct_literature_support": [
+        "turning is a common trigger of freezing of gait",
+        "freezing of gait involves ineffective stepping",
+        "short shuffling steps and trembling are clinically relevant descriptors",
+        "gait initiation and gait modulation are especially impaired in freezers"
+      ],
+      "heuristic_components": [
+        "score weights",
+        "possible_fog_turn threshold",
+        "rotation_motion_mismatch_score formula",
+        "left-right alternation failure proxy",
+        "shuffle-like stepping proxy from pose velocity"
+      ],
+      "features": [
+        "low_motion_ratio",
+        "motion_suppression_score",
+        "rotation_motion_mismatch_score",
+        "step_irregularity_score",
+        "shuffle_step_score",
+        "stall_during_rotation_score",
+        "turn_context"
+      ],
+      "references": [
+        {
+          "title": "Freezing of gait: moving forward on a mysterious clinical phenomenon",
+          "doi": "10.1016/S1474-4422(11)70143-0",
+          "pubmed": "https://pubmed.ncbi.nlm.nih.gov/21777828/"
+        },
+        {
+          "title": "Gait Initiation Impairment in Patients with Parkinson's Disease and Freezing of Gait",
+          "doi": "10.3390/bioengineering9110639",
+          "pubmed": "https://pubmed.ncbi.nlm.nih.gov/36354550/"
+        },
+        {
+          "title": "Abnormalities of the First Three Steps of Gait Initiation in Patients with Parkinson's Disease with Freezing of Gait",
+          "doi": "10.4061/2011/202937",
+          "pubmed": "https://pubmed.ncbi.nlm.nih.gov/22135799/"
+        },
+        {
+          "title": "Turning and unilateral cueing in Parkinson's disease patients with and without freezing of gait",
+          "doi": "10.1016/j.neuroscience.2012.01.024",
+          "pubmed": "https://pubmed.ncbi.nlm.nih.gov/22342993/"
+        }
+      ],
+      "limitations": [
+        "not a validated clinical diagnostic model",
+        "depends on monocular pose quality and camera viewpoint",
+        "turn scores are literature-informed heuristics rather than validated coefficients",
+        "medical interpretation requires validation on labeled turning-FOG datasets"
+      ]
+    },
+    "activity_timeline": {
+      "fps": 30.0,
+      "segments": [
+        {
+          "label": "standing",
+          "start_frame": 0,
+          "end_frame": 575,
+          "start_time": 0.0,
+          "end_time": 19.166666666666668,
+          "duration": 19.166666666666668
+        }
+      ],
+      "summary": {
+        "walking_time": 0.0,
+        "turning_time": 0.0,
+        "standing_time": 19.166666666666668,
+        "walking_ratio": 0.0,
+        "turning_ratio": 0.0,
+        "standing_ratio": 1.0
+      }
+    },
+    "biomarkers": {
+      "stride_cv": null,
+      "arm_swing_asymmetry": null,
+      "step_time_asymmetry": null,
+      "pd_risk_score": null,
+      "walk_ratio": 0.0
+    },
+    "gait_metrics": {
+      "walking_speed": null,
+      "stride_length": null,
+      "cadence": null,
+      "step_count": 0
+    },
+    "classification": "Unknown",
+    "pd_risk_score": 0.0,
+    "segments": [],
+    "fog_transitions": [],
+    "fog_transition_count": 0
+  }
+}
