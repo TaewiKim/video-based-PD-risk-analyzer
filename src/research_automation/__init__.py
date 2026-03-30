@@ -9,10 +9,8 @@ __version__ = "0.1.0"
 
 from research_automation.core import (
     Base,
-    ClaudeClient,
     Settings,
     StorageManager,
-    get_claude_client,
     get_session,
     get_settings,
     init_db,
@@ -20,11 +18,9 @@ from research_automation.core import (
 
 __all__ = [
     "Base",
-    "ClaudeClient",
     "Settings",
     "StorageManager",
     "__version__",
-    "get_claude_client",
     "get_session",
     "get_settings",
     "init_db",

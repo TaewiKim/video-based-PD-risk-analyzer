@@ -1,15 +1,32 @@
 import json
 
+from django.db.utils import OperationalError, ProgrammingError
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
 from .activity_schema import normalize_activity_schema
 from .api_common import client_key, usage_snapshot
+from .models import AnalysisResult
 from .runtime import ALLOWED_EXTENSIONS, RESULTS_DIR, UPLOAD_DIR
 
 
 @require_GET
 def api_results(request):
+    try:
+        items = [
+            {
+                "filename": row.result_filename,
+                "type": row.result_type,
+                "video_filename": row.video_filename or None,
+                "size_bytes": len(json.dumps(row.payload, ensure_ascii=False).encode("utf-8")),
+                "modified_ts": row.updated_at.timestamp(),
+            }
+            for row in AnalysisResult.objects.all().order_by("-updated_at")
+        ]
+        return JsonResponse(items, safe=False)
+    except (OperationalError, ProgrammingError):
+        pass
+
     items = []
     for path in sorted(RESULTS_DIR.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True):
         stem = path.stem
@@ -33,6 +50,20 @@ def api_results(request):
 
 @require_GET
 def api_result_file(request, filename: str):
+    try:
+        row = AnalysisResult.objects.filter(result_filename=filename).first()
+        if row is not None:
+            payload = normalize_activity_schema(row.payload)
+            return JsonResponse(
+                {
+                    "result_filename": row.result_filename,
+                    "video_filename": row.video_filename or None,
+                    "data": payload,
+                }
+            )
+    except (OperationalError, ProgrammingError):
+        pass
+
     result_path = RESULTS_DIR / filename
     if not result_path.exists() or result_path.suffix.lower() != ".json":
         return JsonResponse({"error": "Result file not found"}, status=404)

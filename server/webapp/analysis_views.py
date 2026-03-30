@@ -13,6 +13,18 @@ from .api_common import (
     parse_json_body,
 )
 from .runtime import RESULTS_DIR, UPLOAD_DIR
+from .models import AnalysisResult
+
+
+def _persist_result_record(result_filename: str, result_type: str, video_filename: str, payload: dict) -> None:
+    AnalysisResult.objects.update_or_create(
+        result_filename=result_filename,
+        defaults={
+            "result_type": result_type,
+            "video_filename": video_filename,
+            "payload": payload,
+        },
+    )
 
 
 @csrf_exempt
@@ -33,10 +45,10 @@ def api_analyze(request):
 
     try:
         results = analyzer.analyze_video(str(filepath), identify_user=identify_user)
-        with open(
-            RESULTS_DIR / f"{filename.rsplit('.', 1)[0]}_results.json", "w", encoding="utf-8"
-        ) as f:
+        result_filename = f"{filename.rsplit('.', 1)[0]}_results.json"
+        with open(RESULTS_DIR / result_filename, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, default=str)
+        _persist_result_record(result_filename, "gait", filename, results)
         return JsonResponse({**results, "usage": usage})
     except Exception as exc:
         return JsonResponse({"error": str(exc), **usage}, status=500)
@@ -160,7 +172,7 @@ def api_analyze_symptoms(request):
 
         for person in results.get("persons", []):
             fog_result = person.get("symptoms", {}).get("fog")
-            if fog_result:
+            if fog_result is not None:
                 fog_result["transitions_detected"] = len(fog_transitions)
                 fog_result["transitions"] = fog_transitions
                 fog_result["turn_detection"] = turn_detection
@@ -176,10 +188,10 @@ def api_analyze_symptoms(request):
 
         results = normalize_activity_schema(results)
 
-        with open(
-            RESULTS_DIR / f"{filename.rsplit('.', 1)[0]}_symptoms.json", "w", encoding="utf-8"
-        ) as f:
+        result_filename = f"{filename.rsplit('.', 1)[0]}_symptoms.json"
+        with open(RESULTS_DIR / result_filename, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, default=str)
+        _persist_result_record(result_filename, "symptoms", filename, results)
 
         return JsonResponse({**results, "usage": usage})
     except Exception as exc:

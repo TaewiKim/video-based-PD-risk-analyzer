@@ -32,6 +32,7 @@
                 linear-gradient(180deg, #f9fcfe 0%, var(--bg) 100%);
             color: var(--text);
             min-height: 100vh;
+            overflow-x: hidden;
         }
         .container { max-width: 1760px; margin: 0 auto; padding: 24px; }
 
@@ -59,7 +60,7 @@
         .header-features {
             display: flex;
             gap: 8px;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             justify-content: flex-end;
             align-items: center;
             flex: 0 1 auto;
@@ -87,12 +88,45 @@
             border-color: rgba(29, 154, 138, 0.18);
             color: var(--text);
         }
+        .lang-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            border-radius: 999px;
+            background: rgba(22, 48, 66, 0.06);
+            border: 1px solid var(--line);
+            flex: 0 0 auto;
+        }
+        .lang-toggle button {
+            border: none;
+            background: transparent;
+            color: var(--text-soft);
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 0.78em;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            line-height: 1.1;
+        }
+        .lang-toggle button.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+            color: #fff;
+        }
 
         .benchmark-table {
-            width: 100%;
+            width: max-content;
+            min-width: 100%;
             border-collapse: collapse;
             font-size: 0.84em;
             margin-top: 10px;
+        }
+        .table-scroll {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .benchmark-table th, .benchmark-table td {
             border-bottom: 1px solid var(--line);
@@ -125,7 +159,7 @@
         }
 
         /* Tabs */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .tab {
             background: rgba(255, 255, 255, 0.7);
             border: 1px solid var(--line);
@@ -134,6 +168,11 @@
             cursor: pointer;
             color: var(--text-muted);
             transition: all 0.2s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
         }
         .tab:hover { border-color: var(--primary); color: var(--text); background: var(--surface); }
         .tab.active {
@@ -163,12 +202,14 @@
             width: 100%;
             max-width: 1240px;
             justify-self: center;
+            min-width: 0;
         }
         .analysis-section {
             width: 100%;
             max-width: 1120px;
             margin-left: auto;
             margin-right: auto;
+            min-width: 0;
         }
         .card h2 {
             color: var(--text);
@@ -250,11 +291,16 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px 12px;
             color: var(--text-muted);
             font-size: 0.85em;
             max-width: 920px;
             margin-left: auto;
             margin-right: auto;
+        }
+        .video-tools label {
+            min-width: 0;
         }
 
         /* Timeline */
@@ -316,6 +362,12 @@
             font-size: 1em;
             font-weight: 600;
             transition: all 0.2s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+            flex-shrink: 0;
         }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(31, 111, 178, 0.25); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
@@ -412,6 +464,57 @@
             font-size: 0.9em;
             margin-bottom: 15px;
         }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .chart-header h4 {
+            margin-bottom: 0;
+            flex: 1;
+        }
+        .confidence-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.76em;
+            font-weight: 700;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+        .confidence-badge.excellent,
+        .confidence-badge.good {
+            background: rgba(35, 134, 92, 0.12);
+            color: var(--success);
+            border-color: rgba(35, 134, 92, 0.2);
+        }
+        .confidence-badge.fair {
+            background: rgba(184, 116, 20, 0.12);
+            color: var(--warning);
+            border-color: rgba(184, 116, 20, 0.2);
+        }
+        .confidence-badge.poor,
+        .confidence-badge.insufficient-data,
+        .confidence-badge.unknown {
+            background: rgba(191, 74, 68, 0.12);
+            color: var(--danger);
+            border-color: rgba(191, 74, 68, 0.2);
+        }
+        .chart-note {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(184, 116, 20, 0.08);
+            border: 1px solid rgba(184, 116, 20, 0.18);
+            color: var(--warning);
+            font-size: 0.88em;
+            line-height: 1.5;
+        }
+        .chart-note strong { color: #8f5d0a; }
         .chart-wrapper {
             position: relative;
             height: 200px;
@@ -499,9 +602,24 @@
             background: rgba(255,255,255,0.76);
             border-radius: 8px;
             border: 1px solid var(--line);
+            min-width: 0;
         }
-        .stats-meta-value { font-size: 1.3em; font-weight: 600; color: var(--primary); }
-        .stats-meta-label { font-size: 0.75em; color: var(--text-soft); margin-top: 4px; }
+        .stats-meta-value {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+        .stats-meta-label {
+            font-size: 0.75em;
+            color: var(--text-soft);
+            margin-top: 4px;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
 
         .gait-subheader {
             margin-bottom: 10px;
@@ -539,7 +657,8 @@
 
         /* Parameter Statistics Table */
         .stats-table {
-            width: 100%;
+            width: max-content;
+            min-width: 100%;
             border-collapse: collapse;
             font-size: 0.85em;
         }
@@ -631,6 +750,24 @@
             flex: 1;
             text-align: center;
             text-transform: capitalize;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #videoActionRow {
+            flex-wrap: wrap;
+        }
+        #analysisVideoPanelHost,
+        #analysisVideoPanelHost > *,
+        #analysisVideoPanelHost .video-tools,
+        #analysisVideoPanelHost .video-container {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+        #analysisVideoPanel .stats-header {
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         /* Symptom severity colors */
@@ -657,6 +794,16 @@
         }
         @media (max-width: 900px) {
             .stats-meta { grid-template-columns: repeat(2, 1fr); }
+            .video-tools {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            #videoActionRow {
+                flex-direction: column;
+            }
+            #videoActionRow .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -664,23 +811,27 @@
     <div class="container">
         <header>
             <div class="header-copy">
-                <h1><span>PD</span> Gait Biomarkers</h1>
-                <p style="color: var(--text-soft); margin-top: 5px;">Clinical-style gait screening for Parkinsonian motor biomarkers</p>
+                <h1><span>PD</span> <span data-i18n="header.title">Gait Biomarkers</span></h1>
+                <p style="color: var(--text-soft); margin-top: 5px;" data-i18n="header.subtitle">Clinical-style gait screening for Parkinsonian motor biomarkers</p>
             </div>
             <div class="header-features">
-                <div class="feature-badge active"><span>Gait</span> Biomarker Analysis</div>
-                <div class="feature-badge active"><span>Tremor</span> Symptom Screening</div>
-                <div class="feature-badge active"><span>Posture</span> Video Review</div>
-                <div class="feature-badge active"><span>Data</span> CARE-PD (n=2,953)</div>
-                <div class="feature-badge active"><span>Model</span> HistGradientBoosting</div>
+                <div class="feature-badge active" data-i18n-html="header.badge_gait"><span>Gait</span> Biomarker Analysis</div>
+                <div class="feature-badge active" data-i18n-html="header.badge_tremor"><span>Tremor</span> Symptom Screening</div>
+                <div class="feature-badge active" data-i18n-html="header.badge_posture"><span>Posture</span> Video Review</div>
+                <div class="feature-badge active" data-i18n-html="header.badge_data"><span>Data</span> CARE-PD (n=2,953)</div>
+                <div class="feature-badge active" data-i18n-html="header.badge_model"><span>Model</span> HistGradientBoosting</div>
+                <div class="lang-toggle" aria-label="Language toggle">
+                    <button type="button" id="langKoBtn" onclick="setLanguage('ko')">한국어</button>
+                    <button type="button" id="langEnBtn" onclick="setLanguage('en')">English</button>
+                </div>
             </div>
         </header>
 
         <!-- Tabs -->
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('analyze')">Analysis</div>
-            <div class="tab" onclick="switchTab('users')">Profiles</div>
-            <div class="tab" onclick="switchTab('history')">History</div>
+            <div class="tab active" onclick="switchTab('analyze')" data-i18n="tabs.analysis">Analysis</div>
+            <div class="tab" onclick="switchTab('users')" data-i18n="tabs.profiles">Profiles</div>
+            <div class="tab" onclick="switchTab('history')" data-i18n="tabs.history">History</div>
         </div>
 
         <!-- Analysis Tab -->
@@ -688,12 +839,12 @@
             <div class="main-grid" id="analysisMainGrid">
                 <!-- Left: Video -->
                 <div class="card" id="videoInputCard">
-                    <h2><span class="icon">📹</span> Video Input</h2>
+                    <h2><span class="icon">📹</span> <span data-i18n="video.input">Video Input</span></h2>
 
                     <div id="uploadArea" class="upload-area">
                         <div class="icon">📁</div>
-                        <p><strong>Drop video file here</strong></p>
-                        <p style="color: var(--text-muted); font-size: 0.9em;">MP4, AVI, MOV supported</p>
+                        <p><strong data-i18n="upload.drop">Drop video file here</strong></p>
+                        <p style="color: var(--text-muted); font-size: 0.9em;" data-i18n="upload.supported">MP4, AVI, MOV supported</p>
                         <input type="file" id="fileInput" accept="video/*" style="display:none">
                     </div>
 
@@ -709,7 +860,7 @@
                             </div>
                         </div>
                         <div class="video-tools">
-                            <label><input type="checkbox" id="skeletonToggle" checked> Show Skeleton Overlay</label>
+                            <label><input type="checkbox" id="skeletonToggle" checked> <span data-i18n="video.show_skeleton">Show Skeleton Overlay</span></label>
                             <span id="skeletonStatus">No skeleton</span>
                         </div>
                         <div id="skeletonSourceStatus" style="margin-top: 8px; font-size: 0.85em; color: var(--text-soft);">
@@ -717,8 +868,8 @@
                         </div>
 
                         <div id="videoActionRow" style="display: flex; gap: 10px; margin-top: 15px;">
-                            <button class="btn btn-secondary" onclick="selectNewVideo()" style="flex:1">📁 New Video</button>
-                            <button class="btn btn-success" id="symptomBtn" onclick="analyzeSymptoms()" style="flex:3">🧠 Full PD Scan (Gait + Symptoms)</button>
+                            <button class="btn btn-secondary" onclick="selectNewVideo()" style="flex:1" data-i18n="video.new_video">📁 New Video</button>
+                            <button class="btn btn-success" id="symptomBtn" onclick="analyzeSymptoms()" style="flex:3" data-i18n="video.full_scan">🧠 Full PD Scan (Gait + Symptoms)</button>
                         </div>
                     </div>
                     </div>
@@ -731,12 +882,12 @@
 
                 <!-- Right: Results -->
                 <div class="card" id="analysisResultsCard">
-                    <h2><span class="icon">📊</span> PD Biomarker Analysis</h2>
+                    <h2><span class="icon">📊</span> <span data-i18n="results.title">PD Biomarker Analysis</span></h2>
 
                     <div id="resultsPlaceholder" class="analysis-section" style="text-align: center; padding: 60px 20px; color: #444;">
                         <div style="font-size: 4em; margin-bottom: 20px;">🧠</div>
-                        <p>Upload a video to analyze PD-specific biomarkers</p>
-                        <p style="font-size: 0.85em; margin-top: 10px; color: #555;">
+                        <p data-i18n="results.placeholder_title">Upload a video to analyze PD-specific biomarkers</p>
+                        <p style="font-size: 0.85em; margin-top: 10px; color: #555;" data-i18n="results.placeholder_desc">
                             Measures: Stride Variability, Arm Swing, Step Timing Asymmetry
                         </p>
                     </div>
@@ -744,12 +895,12 @@
                     <div id="analysisVideoPanel" class="stats-box analysis-section" style="display: none; margin-bottom: 20px;">
                         <div class="stats-header">
                             <div>
-                                <strong>Video Review</strong>
+                                <strong data-i18n="results.video_review">Video Review</strong>
                                 <div style="color: var(--text-soft); font-size: 0.85em; margin-top: 3px;" id="analysisVideoSubtext">
                                     Review the same tracked person used by the current analysis.
                                 </div>
                             </div>
-                            <button class="btn btn-secondary" onclick="selectNewVideo()">📁 New Video</button>
+                            <button class="btn btn-secondary" onclick="selectNewVideo()" data-i18n="video.new_video">📁 New Video</button>
                         </div>
                         <div id="analysisVideoPanelHost"></div>
                     </div>
@@ -765,28 +916,28 @@
                         <div class="pd-risk-box">
                             <div class="pd-risk-item">
                                 <div class="pd-risk-score" id="pdRiskScore">-</div>
-                                <div class="pd-risk-label">PD Risk Score</div>
+                                <div class="pd-risk-label" data-i18n="gait.pd_risk_score">PD Risk Score</div>
                             </div>
                             <div class="pd-risk-item">
                                 <div class="pd-risk-score" id="pdRiskLevel">-</div>
-                                <div class="pd-risk-label">Risk Level</div>
+                                <div class="pd-risk-label" data-i18n="gait.risk_level">Risk Level</div>
                             </div>
                             <div class="pd-risk-item">
                                 <div class="pd-risk-score" id="abnormalCount">-</div>
-                                <div class="pd-risk-label">Abnormal Indicators</div>
+                                <div class="pd-risk-label" data-i18n="gait.abnormal_indicators">Abnormal Indicators</div>
                             </div>
                             <div class="pd-risk-item">
                                 <div class="pd-risk-score" id="hgbRuntimeScore">-</div>
-                                <div class="pd-risk-label">HGB Runtime</div>
+                                <div class="pd-risk-label" data-i18n="gait.hgb_runtime">HGB Runtime</div>
                             </div>
                             <div class="pd-risk-item">
                                 <div class="pd-risk-score" id="pipelineStatus">-</div>
-                                <div class="pd-risk-label">Skeleton Pipeline</div>
+                                <div class="pd-risk-label" data-i18n="gait.skeleton_pipeline">Skeleton Pipeline</div>
                             </div>
                         </div>
 
                         <!-- Basic Gait Parameters -->
-                        <h3>📏 Basic Gait Parameters</h3>
+                        <h3 data-i18n="gait.basic_parameters">📏 Basic Gait Parameters</h3>
                         <div class="results-grid">
                             <div class="result-box" id="speedBox">
                                 <div class="result-value" id="speedValue">-</div>
@@ -815,7 +966,7 @@
                         </div>
 
                         <!-- PD-Specific Biomarkers -->
-                        <h3>🧠 PD Detection Biomarkers</h3>
+                        <h3 data-i18n="gait.biomarkers">🧠 PD Detection Biomarkers</h3>
                         <div style="background: rgba(31, 111, 178, 0.08); border-radius: 8px; padding: 10px 15px; margin-bottom: 15px; font-size: 0.85em; color: var(--text-soft);">
                             ⓘ Web risk summary is based on literature-reported gait biomarkers. Runtime HGB probability, when available, is shown separately and should not be read as the same cutoff scale.
                         </div>
@@ -838,7 +989,7 @@
                         </div>
 
                         <!-- Secondary Indicators -->
-                        <h3 style="margin-top: 20px;">📊 Secondary Indicators</h3>
+                        <h3 style="margin-top: 20px;" data-i18n="gait.secondary_indicators">📊 Secondary Indicators</h3>
                         <div class="results-grid" style="grid-template-columns: repeat(4, 1fr);">
                             <div class="result-box" id="strideCvBox">
                                 <div class="result-value" id="strideCvValue" style="font-size: 1.2em;">-</div>
@@ -861,25 +1012,29 @@
                         <!-- Charts -->
                         <div class="charts-grid">
                             <!-- Radar Chart: Parameter Comparison -->
-                            <div class="chart-container">
-                                <h4>📊 Parameter Profile vs Reference</h4>
+                            <div class="chart-container" id="profileChartCard">
+                                <div class="chart-header">
+                                    <h4 data-i18n="charts.heuristic_profile">📊 Heuristic Gait Profile</h4>
+                                    <span class="confidence-badge unknown" id="chartConfidenceBadge">-</span>
+                                </div>
                                 <div class="chart-wrapper">
                                     <canvas id="radarChart"></canvas>
                                 </div>
                             </div>
 
                             <!-- Bar Chart: Speed Comparison -->
-                            <div class="chart-container">
-                                <h4>🏃 Speed Comparison</h4>
+                            <div class="chart-container" id="speedChartCard">
+                                <h4 data-i18n="charts.speed_comparison">🏃 Speed Comparison</h4>
                                 <div class="chart-wrapper">
                                     <canvas id="speedChart"></canvas>
                                 </div>
                             </div>
                         </div>
+                        <div class="chart-note" id="chartConfidenceNote" style="display: none;"></div>
 
                         <!-- Detailed Comparison Bars -->
-                        <h3>📈 Reference Comparison</h3>
-                        <div class="comparison-bars">
+                        <h3 id="referenceComparisonHeading" data-i18n="charts.reference_comparison">📈 Reference Comparison</h3>
+                        <div class="comparison-bars" id="referenceComparisonBars">
                             <div class="comparison-bar">
                                 <div class="comparison-bar-label"><span>Your Speed</span><span id="userSpeedLabel">-</span></div>
                                 <div class="comparison-bar-track">
@@ -890,19 +1045,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="reference-legend">
+                        <div class="reference-legend" id="referenceComparisonLegend">
                             <div class="legend-item"><div class="legend-dot" style="background: #d6e2ea;"></div> Healthy (1.21)</div>
                             <div class="legend-item"><div class="legend-dot" style="background: #ff9800;"></div> PD ON (1.02)</div>
                             <div class="legend-item"><div class="legend-dot" style="background: #f44336;"></div> PD OFF (0.86)</div>
                         </div>
 
                         <!-- Statistical Analysis -->
-                        <h3>📊 Statistical Analysis (Across All Segments)</h3>
+                        <h3 data-i18n="stats.analysis">📊 Statistical Analysis (Across All Segments)</h3>
                         <div class="stats-box" id="statsBox">
                             <div class="stats-header">
                                 <div>
-                                    <strong>Multi-Segment Statistical Summary</strong>
-                                    <div style="color: var(--text-soft); font-size: 0.85em; margin-top: 3px;">Aggregated analysis with 95% confidence intervals</div>
+                                    <strong data-i18n="stats.summary">Multi-Segment Statistical Summary</strong>
+                                    <div style="color: var(--text-soft); font-size: 0.85em; margin-top: 3px;" data-i18n="stats.summary_sub">Aggregated analysis with 95% confidence intervals</div>
                                 </div>
                                 <span class="stats-quality" id="statsQuality">-</span>
                             </div>
@@ -926,19 +1081,21 @@
                                 </div>
                             </div>
 
-                            <table class="stats-table">
-                                <thead>
-                                    <tr>
-                                        <th>Parameter</th>
-                                        <th>Mean ± SD</th>
-                                        <th>95% CI</th>
-                                        <th>CV%</th>
-                                        <th>Range</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="statsTableBody">
-                                </tbody>
-                            </table>
+                            <div class="table-scroll">
+                                <table class="stats-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Mean ± SD</th>
+                                            <th>95% CI</th>
+                                            <th>CV%</th>
+                                            <th>Range</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="statsTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         <!-- PD Statistical Assessment -->
@@ -951,20 +1108,22 @@
                                 <span class="stats-quality" id="pdStatsRiskLevel">-</span>
                             </div>
 
-                            <table class="stats-table">
-                                <thead>
-                                    <tr>
-                                        <th>Indicator</th>
-                                        <th>Mean</th>
-                                        <th>Threshold</th>
-                                        <th>Abnormal %</th>
-                                        <th>p-value</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="pdStatsTableBody">
-                                </tbody>
-                            </table>
+                            <div class="table-scroll">
+                                <table class="stats-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Indicator</th>
+                                            <th>Mean</th>
+                                            <th>Threshold</th>
+                                            <th>Abnormal %</th>
+                                            <th>p-value</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pdStatsTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         <!-- Segments -->
@@ -972,6 +1131,7 @@
                         <div class="segments-list" id="segmentsList"></div>
 
                         <h3>🏁 Model Benchmark (CARE-PD)</h3>
+                        <div class="table-scroll">
                         <table class="benchmark-table">
                             <thead>
                                 <tr>
@@ -1042,6 +1202,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        </div>
                         <div class="preprocessing-info">
                             <strong>Preprocessing Pipeline:</strong> FPS normalization (target=30) + translation alignment (origin + PCA forward axis) + velocity outlier clipping (99th percentile), then grouped CV by subject. Benchmark values summarize offline CARE-PD experiments; web inference uses literature gait cutoffs and optionally displays runtime model probability as a separate signal.
                         </div>
@@ -1060,12 +1221,12 @@
                             <div class="person-tabs" id="personTabs" style="display: flex; gap: 10px; margin-top: 10px;"></div>
                         </div>
 
-                        <h3>1. Activity Classification</h3>
+                        <h3 data-i18n="symptom.activity_classification">1. Activity Classification</h3>
                         <div class="stats-box" id="activityBox">
-                            <div style="margin-bottom: 12px; font-size: 0.82em; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.04em;">
+                            <div style="margin-bottom: 12px; font-size: 0.82em; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.04em;" data-i18n="symptom.primary_activity_view">
                                 Primary Activity View
                             </div>
-                            <div style="margin-bottom: 15px; font-size: 0.9em; color: var(--text-soft);">
+                            <div style="margin-bottom: 15px; font-size: 0.9em; color: var(--text-soft);" data-i18n="symptom.primary_activity_desc">
                                 보행 바이오마커 결과가 있으면 walking, turning, standing을 우선 표시합니다. resting/task는 증상 라우팅 참고 정보로 함께 남깁니다.
                             </div>
                             <div class="stats-meta" style="grid-template-columns: repeat(5, 1fr); margin-bottom: 15px;">
@@ -1111,12 +1272,12 @@
                                 <div class="timeline-legend-item"><div class="timeline-legend-swatch" style="background: #ff9800;"></div>Task</div>
                             </div>
                             <div style="margin-top: 15px;">
-                                <div style="font-size: 0.9em; color: var(--text-soft); margin-bottom: 10px;">Jump to primary gait-phase segments</div>
+                                <div style="font-size: 0.9em; color: var(--text-soft); margin-bottom: 10px;" data-i18n="symptom.jump_to_segments">Jump to primary gait-phase segments</div>
                                 <div id="activitySegmentList" class="segments-list"></div>
                             </div>
                         </div>
 
-                        <h3 style="margin-top: 28px;">2. Symptom Screening</h3>
+                        <h3 style="margin-top: 28px;" data-i18n="symptom.screening">2. Symptom Screening</h3>
 
                         <!-- Overall Risk Assessment -->
                         <div class="classification-box" id="symptomClassificationBox">
@@ -1325,44 +1486,44 @@
                         </div>
 
                         <div id="fogTransitionSection">
-                        <h3>🚶↔️🧍 보행동결 전환점 분석 (FOG at Transitions)</h3>
+                        <h3 data-i18n="fog.transition_title">🚶↔️🧍 보행동결 전환점 분석 (FOG at Transitions)</h3>
                         <div class="stats-box" id="fogTransitionBox">
-                            <div style="margin-bottom: 15px; font-size: 0.85em; color: var(--text-soft);">
+                            <div style="margin-bottom: 15px; font-size: 0.85em; color: var(--text-soft);" data-i18n="fog.transition_desc">
                                 서있는 구간 ↔ 보행구간 전환점에서 보행동결을 감지합니다. (보행 시작/종료 시 발생하는 FOG)
                             </div>
                             <div class="stats-meta" style="grid-template-columns: repeat(5, 1fr);">
                                 <div class="stats-meta-item">
                                     <div class="stats-meta-value" id="fogTransitionCount">-</div>
-                                    <div class="stats-meta-label">전환점 수</div>
+                                    <div class="stats-meta-label" data-i18n="fog.transition_count">전환점 수</div>
                                 </div>
                                 <div class="stats-meta-item">
                                     <div class="stats-meta-value" id="fogHesitation">-</div>
-                                    <div class="stats-meta-label">주저함 비율</div>
+                                    <div class="stats-meta-label" data-i18n="fog.hesitation_ratio">주저함 비율</div>
                                 </div>
                                 <div class="stats-meta-item">
                                     <div class="stats-meta-value" id="fogInitDelay">-</div>
-                                    <div class="stats-meta-label">시작 지연 (초)</div>
+                                    <div class="stats-meta-label" data-i18n="fog.init_delay">시작 지연 (초)</div>
                                 </div>
                                 <div class="stats-meta-item">
                                     <div class="stats-meta-value" id="fogTransitionFestination">-</div>
-                                    <div class="stats-meta-label">종종걸음</div>
+                                    <div class="stats-meta-label" data-i18n="fog.festination">종종걸음</div>
                                 </div>
                                 <div class="stats-meta-item">
                                     <div class="stats-meta-value" id="fogAkinesia">-</div>
-                                    <div class="stats-meta-label">운동차단</div>
+                                    <div class="stats-meta-label" data-i18n="fog.akinesia">운동차단</div>
                                 </div>
                             </div>
 
                             <!-- Transition Events List -->
                             <div style="margin-top: 15px;">
-                                <div style="font-size: 0.9em; color: var(--text-soft); margin-bottom: 10px;">감지된 전환점</div>
+                                <div style="font-size: 0.9em; color: var(--text-soft); margin-bottom: 10px;" data-i18n="fog.detected_transitions">감지된 전환점</div>
                                 <div id="fogTransitionList" class="segments-list" style="max-height: 150px;"></div>
                             </div>
                         </div>
                         </div>
 
-                        <h3 style="margin-top: 28px;">3. Gait And Turning</h3>
-                        <h3>🚶 Gait And Turning Analysis</h3>
+                        <h3 style="margin-top: 28px;" data-i18n="symptom.gait_turning_section">3. Gait And Turning</h3>
+                        <h3 data-i18n="symptom.gait_turning_analysis">🚶 Gait And Turning Analysis</h3>
                         <div class="stats-box" id="gaitAnalysisBox">
                             <div class="gait-subheader">
                                 <span>Walking biomarkers plus turning behavior. Turning is treated as part of gait, not as standing.</span>
@@ -1438,19 +1599,21 @@
                         <!-- Detailed Metrics Table -->
                         <h3>📊 Statistical Summary (All Symptoms)</h3>
                         <div class="stats-box">
-                            <table class="stats-table">
-                                <thead>
-                                    <tr>
-                                        <th>Symptom</th>
-                                        <th>Metric</th>
-                                        <th>Mean ± SD</th>
-                                        <th>95% CI</th>
-                                        <th>Segments</th>
-                                        <th>Severity</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="symptomStatsTableBody"></tbody>
-                            </table>
+                            <div class="table-scroll">
+                                <table class="stats-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Symptom</th>
+                                            <th>Metric</th>
+                                            <th>Mean ± SD</th>
+                                            <th>95% CI</th>
+                                            <th>Segments</th>
+                                            <th>Severity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="symptomStatsTableBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1460,12 +1623,12 @@
         <!-- Users Tab -->
         <div id="usersTab" class="tab-content">
             <div class="card">
-                <h2><span class="icon">👥</span> Registered Users</h2>
-                <p style="color: var(--text-soft); margin-bottom: 20px;">Register users for automatic identification</p>
+                <h2><span class="icon">👥</span> <span data-i18n="users.title">Registered Users</span></h2>
+                <p style="color: var(--text-soft); margin-bottom: 20px;" data-i18n="users.subtitle">Register users for automatic identification</p>
                 <div class="user-grid" id="userGrid">
                     <div class="user-card add-user-card" onclick="openRegisterModal()">
                         <div class="icon">➕</div>
-                        <div>Add User</div>
+                        <div data-i18n="users.add">Add User</div>
                     </div>
                 </div>
             </div>
@@ -1474,10 +1637,10 @@
         <!-- History Tab -->
         <div id="historyTab" class="tab-content">
             <div class="card">
-                <h2><span class="icon">📈</span> Analysis History</h2>
-                <p style="color: var(--text-soft); margin-bottom: 16px;">Load saved gait or symptom analysis JSON from the server.</p>
+                <h2><span class="icon">📈</span> <span data-i18n="history.title">Analysis History</span></h2>
+                <p style="color: var(--text-soft); margin-bottom: 16px;" data-i18n="history.subtitle">Load saved gait or symptom analysis JSON from the server.</p>
                 <div style="display:flex; gap:10px; margin-bottom:16px;">
-                    <button class="btn btn-secondary" onclick="loadHistory()">Refresh</button>
+                    <button class="btn btn-secondary" onclick="loadHistory()" data-i18n="history.refresh">Refresh</button>
                 </div>
                 <div id="historyList" class="segments-list"></div>
             </div>
@@ -1485,35 +1648,162 @@
     </div>
 
     <!-- Register Modal -->
-    <div class="modal" id="registerModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Register New User</h3>
-                <button class="modal-close" onclick="closeRegisterModal()">×</button>
+        <div class="modal" id="registerModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 data-i18n="users.register">Register New User</h3>
+                    <button class="modal-close" onclick="closeRegisterModal()">×</button>
+                </div>
+                <div class="camera-preview">
+                    <video id="cameraPreview" autoplay playsinline></video>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="users.name">Name</label>
+                    <input type="text" id="userName" placeholder="Enter name" data-i18n-placeholder="users.name_placeholder">
+                </div>
+                <button class="btn" style="width: 100%; margin-top: 15px;" onclick="captureAndRegister()" data-i18n="users.capture">📸 Capture & Register</button>
             </div>
-            <div class="camera-preview">
-                <video id="cameraPreview" autoplay playsinline></video>
-            </div>
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text" id="userName" placeholder="Enter name">
-            </div>
-            <button class="btn" style="width: 100%; margin-top: 15px;" onclick="captureAndRegister()">📸 Capture & Register</button>
         </div>
-    </div>
 
     <script>
+        const TRANSLATIONS = {
+            ko: {
+                'header.title': '보행 바이오마커',
+                'header.subtitle': '파킨슨 운동 바이오마커를 위한 임상형 보행 스크리닝',
+                'header.badge_gait': '<span>보행</span> 바이오마커 분석',
+                'header.badge_tremor': '<span>진전</span> 증상 스크리닝',
+                'header.badge_posture': '<span>자세</span> 비디오 리뷰',
+                'header.badge_data': '<span>데이터</span> CARE-PD (n=2,953)',
+                'header.badge_model': '<span>모델</span> HistGradientBoosting',
+                'tabs.analysis': '분석',
+                'tabs.profiles': '프로필',
+                'tabs.history': '이력',
+                'video.input': '비디오 입력',
+                'upload.drop': '여기에 비디오 파일을 놓으세요',
+                'upload.supported': 'MP4, AVI, MOV 지원',
+                'video.show_skeleton': '스켈레톤 오버레이 표시',
+                'video.new_video': '📁 새 비디오',
+                'video.full_scan': '🧠 전체 PD 스캔 (보행 + 증상)',
+                'results.title': 'PD 바이오마커 분석',
+                'results.placeholder_title': '비디오를 업로드해 PD 특이 바이오마커를 분석하세요',
+                'results.placeholder_desc': '측정 항목: 보폭 변동성, 팔 흔들림, 스텝 타이밍 비대칭',
+                'results.video_review': '비디오 리뷰',
+                'gait.pd_risk_score': 'PD 위험 점수',
+                'gait.risk_level': '위험 수준',
+                'gait.abnormal_indicators': '이상 지표 수',
+                'gait.hgb_runtime': 'HGB 런타임',
+                'gait.skeleton_pipeline': '스켈레톤 파이프라인',
+                'gait.basic_parameters': '📏 기본 보행 지표',
+                'gait.biomarkers': '🧠 PD 탐지 바이오마커',
+                'gait.secondary_indicators': '📊 보조 지표',
+                'charts.heuristic_profile': '📊 휴리스틱 보행 프로파일',
+                'charts.speed_comparison': '🏃 속도 비교',
+                'charts.reference_comparison': '📈 기준 속도 비교',
+                'stats.analysis': '📊 통계 분석 (전체 세그먼트)',
+                'stats.summary': '다중 세그먼트 통계 요약',
+                'stats.summary_sub': '95% 신뢰구간 기반 집계 분석',
+                'symptom.activity_classification': '1. 행동 분류',
+                'symptom.primary_activity_view': '주요 행동 보기',
+                'symptom.primary_activity_desc': '보행 바이오마커 결과가 있으면 walking, turning, standing을 우선 표시합니다. resting/task는 증상 라우팅 참고 정보로 함께 남깁니다.',
+                'symptom.jump_to_segments': '주요 gait-phase 세그먼트로 이동',
+                'symptom.screening': '2. 증상 스크리닝',
+                'symptom.gait_turning_section': '3. 보행 및 회전',
+                'symptom.gait_turning_analysis': '🚶 보행 및 회전 분석',
+                'fog.transition_title': '🚶↔️🧍 보행동결 전환점 분석 (FOG at Transitions)',
+                'fog.transition_desc': '서있는 구간 ↔ 보행구간 전환점에서 보행동결을 감지합니다. (보행 시작/종료 시 발생하는 FOG)',
+                'fog.transition_count': '전환점 수',
+                'fog.hesitation_ratio': '주저함 비율',
+                'fog.init_delay': '시작 지연 (초)',
+                'fog.festination': '종종걸음',
+                'fog.akinesia': '운동차단',
+                'fog.detected_transitions': '감지된 전환점',
+                'users.title': '등록 사용자',
+                'users.subtitle': '자동 식별을 위한 사용자를 등록합니다',
+                'users.add': '사용자 추가',
+                'users.register': '새 사용자 등록',
+                'users.name': '이름',
+                'users.name_placeholder': '이름을 입력하세요',
+                'users.capture': '📸 촬영 후 등록',
+                'history.title': '분석 이력',
+                'history.subtitle': '서버에 저장된 보행/증상 분석 JSON을 불러옵니다.',
+                'history.refresh': '새로고침',
+            },
+            en: {
+                'header.title': 'Gait Biomarkers',
+                'header.subtitle': 'Clinical-style gait screening for Parkinsonian motor biomarkers',
+                'header.badge_gait': '<span>Gait</span> Biomarker Analysis',
+                'header.badge_tremor': '<span>Tremor</span> Symptom Screening',
+                'header.badge_posture': '<span>Posture</span> Video Review',
+                'header.badge_data': '<span>Data</span> CARE-PD (n=2,953)',
+                'header.badge_model': '<span>Model</span> HistGradientBoosting',
+                'tabs.analysis': 'Analysis',
+                'tabs.profiles': 'Profiles',
+                'tabs.history': 'History',
+                'video.input': 'Video Input',
+                'upload.drop': 'Drop video file here',
+                'upload.supported': 'MP4, AVI, MOV supported',
+                'video.show_skeleton': 'Show Skeleton Overlay',
+                'video.new_video': '📁 New Video',
+                'video.full_scan': '🧠 Full PD Scan (Gait + Symptoms)',
+                'results.title': 'PD Biomarker Analysis',
+                'results.placeholder_title': 'Upload a video to analyze PD-specific biomarkers',
+                'results.placeholder_desc': 'Measures: Stride Variability, Arm Swing, Step Timing Asymmetry',
+                'results.video_review': 'Video Review',
+                'gait.pd_risk_score': 'PD Risk Score',
+                'gait.risk_level': 'Risk Level',
+                'gait.abnormal_indicators': 'Abnormal Indicators',
+                'gait.hgb_runtime': 'HGB Runtime',
+                'gait.skeleton_pipeline': 'Skeleton Pipeline',
+                'gait.basic_parameters': '📏 Basic Gait Parameters',
+                'gait.biomarkers': '🧠 PD Detection Biomarkers',
+                'gait.secondary_indicators': '📊 Secondary Indicators',
+                'charts.heuristic_profile': '📊 Heuristic Gait Profile',
+                'charts.speed_comparison': '🏃 Speed Comparison',
+                'charts.reference_comparison': '📈 Reference Comparison',
+                'stats.analysis': '📊 Statistical Analysis (Across All Segments)',
+                'stats.summary': 'Multi-Segment Statistical Summary',
+                'stats.summary_sub': 'Aggregated analysis with 95% confidence intervals',
+                'symptom.activity_classification': '1. Activity Classification',
+                'symptom.primary_activity_view': 'Primary Activity View',
+                'symptom.primary_activity_desc': 'If gait biomarkers are available, walking, turning, and standing are prioritized. Resting/task remain as symptom-routing reference only.',
+                'symptom.jump_to_segments': 'Jump to primary gait-phase segments',
+                'symptom.screening': '2. Symptom Screening',
+                'symptom.gait_turning_section': '3. Gait And Turning',
+                'symptom.gait_turning_analysis': '🚶 Gait And Turning Analysis',
+                'fog.transition_title': '🚶↔️🧍 FOG Transition Analysis',
+                'fog.transition_desc': 'Detect freezing of gait around standing↔walking transition points, including gait initiation and stopping events.',
+                'fog.transition_count': 'Transitions',
+                'fog.hesitation_ratio': 'Hesitation Ratio',
+                'fog.init_delay': 'Start Delay (s)',
+                'fog.festination': 'Festination',
+                'fog.akinesia': 'Akinesia',
+                'fog.detected_transitions': 'Detected Transitions',
+                'users.title': 'Registered Users',
+                'users.subtitle': 'Register users for automatic identification',
+                'users.add': 'Add User',
+                'users.register': 'Register New User',
+                'users.name': 'Name',
+                'users.name_placeholder': 'Enter name',
+                'users.capture': '📸 Capture & Register',
+                'history.title': 'Analysis History',
+                'history.subtitle': 'Load saved gait or symptom analysis JSON from the server.',
+                'history.refresh': 'Refresh',
+            }
+        };
+
         const appState = {
             currentUploadFilename: null,
             activeResult: null,
             selectedPersonId: null,
             reviewMode: 'analysis',
+            language: localStorage.getItem('ui-language') || document.documentElement.lang || 'ko',
         };
         let currentFilename = null;
         let analysisResults = null;
         let cameraStream = null;
         let radarChart = null;
         let speedChart = null;
+        let lastChartReliability = null;
         let symptomResults = null;
         let currentPersonId = null;
         let currentReviewMode = 'analysis';
@@ -1531,6 +1821,82 @@
             [11, 23], [12, 24], [23, 24], [23, 25], [25, 27],
             [27, 29], [29, 31], [24, 26], [26, 28], [28, 30], [30, 32]
         ];
+
+        function t(key, fallback = '') {
+            const lang = appState.language === 'en' ? 'en' : 'ko';
+            return TRANSLATIONS[lang]?.[key] ?? TRANSLATIONS.en?.[key] ?? fallback ?? key;
+        }
+
+        function translateSeverity(level) {
+            const normalized = String(level || '').toLowerCase();
+            if (appState.language === 'ko') {
+                if (normalized === 'normal') return '정상';
+                if (normalized === 'mild') return '경도';
+                if (normalized === 'moderate') return '중등도';
+                if (normalized === 'severe') return '심함';
+                if (normalized === 'high') return '높음';
+                if (normalized === 'low') return '낮음';
+                return level || '-';
+            }
+            if (!level) return '-';
+            return level.charAt(0).toUpperCase() + level.slice(1);
+        }
+
+        function translateYesNo(value) {
+            return appState.language === 'ko'
+                ? (value ? '예' : '아니오')
+                : (value ? 'Yes' : 'No');
+        }
+
+        function applyTranslations(root = document) {
+            root.querySelectorAll('[data-i18n]').forEach((el) => {
+                el.textContent = t(el.dataset.i18n, el.textContent);
+            });
+            root.querySelectorAll('[data-i18n-html]').forEach((el) => {
+                el.innerHTML = t(el.dataset.i18nHtml, el.innerHTML);
+            });
+            root.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+                el.placeholder = t(el.dataset.i18nPlaceholder, el.placeholder);
+            });
+            root.querySelectorAll('[data-i18n-title]').forEach((el) => {
+                el.title = t(el.dataset.i18nTitle, el.title);
+            });
+            document.documentElement.lang = appState.language;
+            const koBtn = document.getElementById('langKoBtn');
+            const enBtn = document.getElementById('langEnBtn');
+            if (koBtn && enBtn) {
+                koBtn.classList.toggle('active', appState.language === 'ko');
+                enBtn.classList.toggle('active', appState.language === 'en');
+            }
+            refreshLanguageDependentText();
+        }
+
+        function setLanguage(language) {
+            appState.language = language === 'en' ? 'en' : 'ko';
+            localStorage.setItem('ui-language', appState.language);
+            applyTranslations();
+            if (document.getElementById('usersTab')?.classList.contains('active')) {
+                loadUsers();
+            }
+            if (document.getElementById('historyTab')?.classList.contains('active')) {
+                loadHistory();
+            }
+            if (appState.activeResult?.data && (appState.activeResult.data.gait_analysis || appState.activeResult.data.persons)) {
+                displaySymptomResults(appState.activeResult.data);
+            }
+            renderSkeletonOverlay();
+            updateVideoActivityIndicator();
+        }
+
+        function refreshLanguageDependentText() {
+            const reviewSubtext = document.getElementById('analysisVideoSubtext');
+            if (reviewSubtext) {
+                reviewSubtext.textContent = appState.language === 'ko'
+                    ? '현재 분석에 사용된 동일 인물을 기준으로 리뷰합니다.'
+                    : 'Review the same tracked person used by the current analysis.';
+            }
+            updateChartConfidencePresentation(lastChartReliability);
+        }
 
         function syncLegacyResultState() {
             currentFilename = appState.currentUploadFilename;
@@ -1781,7 +2147,7 @@
             if (!list) return;
             list.innerHTML = '';
             if (!Array.isArray(segments) || segments.length === 0) {
-                list.innerHTML = '<div style="color:#7f94a3; padding: 10px;">No segments available.</div>';
+                list.innerHTML = `<div style="color:#7f94a3; padding: 10px;">${appState.language === 'ko' ? '사용 가능한 세그먼트가 없습니다.' : 'No segments available.'}</div>`;
                 return;
             }
             segments.forEach((seg, idx) => {
@@ -1795,7 +2161,7 @@
                         <div class="segment-time">${meta}</div>
                     </div>
                     <div>
-                        <button class="btn btn-secondary" style="padding:8px 12px;">Review</button>
+                        <button class="btn btn-secondary" style="padding:8px 12px;">${appState.language === 'ko' ? '리뷰' : 'Review'}</button>
                     </div>
                 `;
                 row.querySelector('button').addEventListener('click', () => {
@@ -1816,17 +2182,29 @@
             const reviewPersonId = getReviewPersonId() || 'none';
             const gaitSource = getAnalysisSourcePersonId();
             const track = symptomResults?.persons?.find(p => p.person_id === reviewPersonId)?.skeleton_track || null;
-            overlayEl.textContent = `Overlay source: ${reviewPersonId} skeleton track | frame stride ${track?.frame_stride || '-'}`;
+            overlayEl.textContent = appState.language === 'ko'
+                ? `오버레이 소스: ${reviewPersonId} 스켈레톤 트랙 | 프레임 간격 ${track?.frame_stride || '-'}`
+                : `Overlay source: ${reviewPersonId} skeleton track | frame stride ${track?.frame_stride || '-'}`;
             if (currentReviewMode === 'selected') {
-                subtextEl.textContent = `Review mode: selected person ${selectedPersonId}. Use activity segments to inspect symptom-routing behavior.`;
+                subtextEl.textContent = appState.language === 'ko'
+                    ? `리뷰 모드: 선택 인물 ${selectedPersonId}. activity 세그먼트로 증상 라우팅 동작을 확인하세요.`
+                    : `Review mode: selected person ${selectedPersonId}. Use activity segments to inspect symptom-routing behavior.`;
             } else if (gaitSource && reviewPersonId === gaitSource) {
-                subtextEl.textContent = `Review mode: gait analysis source ${gaitSource}. Overlay uses the same tracked person, while biomarker calculation uses the processed pose pipeline.`;
+                subtextEl.textContent = appState.language === 'ko'
+                    ? `리뷰 모드: gait analysis source ${gaitSource}. 오버레이는 같은 추적 인물을 사용하고, 바이오마커 계산은 가공된 pose 파이프라인을 사용합니다.`
+                    : `Review mode: gait analysis source ${gaitSource}. Overlay uses the same tracked person, while biomarker calculation uses the processed pose pipeline.`;
             } else {
-                subtextEl.textContent = `Review mode: ${reviewPersonId}.`;
+                subtextEl.textContent = appState.language === 'ko' ? `리뷰 모드: ${reviewPersonId}.` : `Review mode: ${reviewPersonId}.`;
             }
         }
 
         function severityLabelFromLevel(level) {
+            if (appState.language === 'ko') {
+                if (level === 'severe') return '의미 있는 PD 지표';
+                if (level === 'moderate') return '중등도 PD 지표';
+                if (level === 'mild') return '경도 PD 지표';
+                return '정상';
+            }
             if (level === 'severe') return 'Significant PD Indicators';
             if (level === 'moderate') return 'Moderate PD Indicators';
             if (level === 'mild') return 'Mild PD Indicators';
@@ -1853,16 +2231,16 @@
             const phase = activePhase?.activity_type || activePhase?.label || null;
             if (phase === 'walking') {
                 indicator.className = 'video-overlay walking';
-                indicator.textContent = 'Walking';
+                indicator.textContent = appState.language === 'ko' ? '보행 중' : 'Walking';
             } else if (phase === 'turning') {
                 indicator.className = 'video-overlay';
-                indicator.textContent = 'Turning';
+                indicator.textContent = appState.language === 'ko' ? '회전 중' : 'Turning';
             } else if (phase === 'standing') {
                 indicator.className = 'video-overlay not-walking';
-                indicator.textContent = 'Standing';
+                indicator.textContent = appState.language === 'ko' ? '정지' : 'Standing';
             } else {
                 indicator.className = 'video-overlay not-walking';
-                indicator.textContent = 'Analyzing...';
+                indicator.textContent = appState.language === 'ko' ? '분석 중...' : 'Analyzing...';
             }
         }
 
@@ -1905,16 +2283,16 @@
             clearSkeletonCanvas();
 
             if (!toggle.checked) {
-                status.textContent = 'Skeleton hidden';
+                status.textContent = appState.language === 'ko' ? '스켈레톤 숨김' : 'Skeleton hidden';
                 return;
             }
             if (!track || !video.duration || !video.videoWidth) {
-                status.textContent = 'No skeleton';
+                status.textContent = appState.language === 'ko' ? '스켈레톤 없음' : 'No skeleton';
                 return;
             }
             const frames = getSkeletonFrames(track);
             if (!frames.length) {
-                status.textContent = 'No skeleton review frames available';
+                status.textContent = appState.language === 'ko' ? '리뷰 가능한 스켈레톤 프레임이 없습니다' : 'No skeleton review frames available';
                 return;
             }
 
@@ -1927,15 +2305,19 @@
             const rawPoints = frames[frameIdx];
             const frameQuality = (track.pose_quality || [])[frameIdx];
             if (!rawPoints) {
-                status.textContent = 'Out of tracked range';
+                status.textContent = appState.language === 'ko' ? '추적 범위를 벗어났습니다' : 'Out of tracked range';
                 return;
             }
             if (frameQuality !== undefined && frameQuality < SKELETON_MIN_FRAME_QUALITY) {
-                status.textContent = `Low-confidence frame (${frameQuality.toFixed(2)})`;
+                status.textContent = appState.language === 'ko'
+                    ? `저신뢰 프레임 (${frameQuality.toFixed(2)})`
+                    : `Low-confidence frame (${frameQuality.toFixed(2)})`;
                 return;
             }
             if (!hasAnatomicallyPlausibleLowerBody(rawPoints)) {
-                status.textContent = `Pose outlier frame (${frameQuality !== undefined ? frameQuality.toFixed(2) : '-'})`;
+                status.textContent = appState.language === 'ko'
+                    ? `포즈 이상치 프레임 (${frameQuality !== undefined ? frameQuality.toFixed(2) : '-'})`
+                    : `Pose outlier frame (${frameQuality !== undefined ? frameQuality.toFixed(2) : '-'})`;
                 return;
             }
             const points = buildOverlayPoints(rawPoints);
@@ -2004,9 +2386,13 @@
 
             const visiblePoints = points.reduce((count, p, idx) => count + (hasUsablePoint(p, idx) ? 1 : 0), 0);
             const prefix = unclampedFrameIdx < 0
-                ? 'Previewing first tracked frame'
-                : (unclampedFrameIdx >= (track.n_frames || frames.length || 0) ? 'Previewing last tracked frame' : 'Skeleton frame');
-            status.textContent = `${prefix} ${frameIdx + 1}/${track.n_frames || frames.length || '?'} | quality ${frameQuality !== undefined ? frameQuality.toFixed(2) : '-'} | joints ${visiblePoints}/${points.length}`;
+                ? (appState.language === 'ko' ? '첫 추적 프레임 미리보기' : 'Previewing first tracked frame')
+                : (unclampedFrameIdx >= (track.n_frames || frames.length || 0)
+                    ? (appState.language === 'ko' ? '마지막 추적 프레임 미리보기' : 'Previewing last tracked frame')
+                    : (appState.language === 'ko' ? '스켈레톤 프레임' : 'Skeleton frame'));
+            status.textContent = appState.language === 'ko'
+                ? `${prefix} ${frameIdx + 1}/${track.n_frames || frames.length || '?'} | 품질 ${frameQuality !== undefined ? frameQuality.toFixed(2) : '-'} | 관절 ${visiblePoints}/${points.length}`
+                : `${prefix} ${frameIdx + 1}/${track.n_frames || frames.length || '?'} | quality ${frameQuality !== undefined ? frameQuality.toFixed(2) : '-'} | joints ${visiblePoints}/${points.length}`;
         }
 
         function startSkeletonOverlayLoop() {
@@ -2062,7 +2448,7 @@
         startSkeletonOverlayLoop();
 
         async function handleFile(file) {
-            if (!file.type.startsWith('video/')) { alert('Please select a video file'); return; }
+            if (!file.type.startsWith('video/')) { alert(appState.language === 'ko' ? '비디오 파일을 선택하세요' : 'Please select a video file'); return; }
             const formData = new FormData();
             formData.append('video', file);
             clearActiveResultState({ preserveUpload: true });
@@ -2074,7 +2460,7 @@
             mountVideoSectionInResults(false);
             resizeSkeletonCanvas();
             clearSkeletonCanvas();
-            document.getElementById('skeletonStatus').textContent = 'Waiting for analysis';
+            document.getElementById('skeletonStatus').textContent = appState.language === 'ko' ? '분석 대기 중' : 'Waiting for analysis';
             updateResultQuery(null);
             try {
                 const response = await fetch('/upload', { method: 'POST', body: formData });
@@ -2104,8 +2490,8 @@
             fileInput.value = '';
             positionResultSections(false);
             clearSkeletonCanvas();
-            document.getElementById('skeletonStatus').textContent = 'No skeleton';
-            document.getElementById('skeletonSourceStatus').textContent = 'Overlay source: none';
+            document.getElementById('skeletonStatus').textContent = appState.language === 'ko' ? '스켈레톤 없음' : 'No skeleton';
+            document.getElementById('skeletonSourceStatus').textContent = appState.language === 'ko' ? '오버레이 소스: 없음' : 'Overlay source: none';
             updateResultQuery(null);
         }
 
@@ -2120,11 +2506,11 @@
             document.getElementById('symptomBtn').disabled = true;
 
             const steps = [
-                'Loading analysis models...',
-                'Extracting person tracks...',
-                'Analyzing motor symptoms...',
-                'Estimating gait biomarkers...',
-                'Finalizing results...'
+                appState.language === 'ko' ? '분석 모델을 불러오는 중...' : 'Loading analysis models...',
+                appState.language === 'ko' ? '인물 트랙을 추출하는 중...' : 'Extracting person tracks...',
+                appState.language === 'ko' ? '운동 증상을 분석하는 중...' : 'Analyzing motor symptoms...',
+                appState.language === 'ko' ? '보행 바이오마커를 추정하는 중...' : 'Estimating gait biomarkers...',
+                appState.language === 'ko' ? '결과를 마무리하는 중...' : 'Finalizing results...'
             ];
             let progress = 0;
             const interval = setInterval(() => {
@@ -2143,10 +2529,10 @@
 
                 clearInterval(interval);
                 progressFill.style.width = '100%';
-                progressText.textContent = 'Complete!';
+                progressText.textContent = appState.language === 'ko' ? '완료!' : 'Complete!';
 
                 const symptomData = await symptomResponse.json();
-                if (symptomData.error) { alert('Symptom Error: ' + symptomData.error); return; }
+                if (symptomData.error) { alert((appState.language === 'ko' ? '증상 분석 오류: ' : 'Symptom Error: ') + symptomData.error); return; }
 
                 symptomData.gait_analysis = symptomData.gait_analysis || null;
                 const resultFilename = `${currentFilename.replace(/\.[^.]+$/, '')}_symptoms.json`;
@@ -2163,7 +2549,7 @@
             } catch (error) {
                 clearInterval(interval);
                 console.error('Analysis error:', error);
-                alert('Analysis failed: ' + error.message);
+                alert((appState.language === 'ko' ? '분석 실패: ' : 'Analysis failed: ') + error.message);
             } finally {
                 setTimeout(() => {
                     progressContainer.style.display = 'none';
@@ -2174,12 +2560,12 @@
 
         async function loadHistory() {
             const list = document.getElementById('historyList');
-            list.innerHTML = '<div style="color:#7f94a3;">Loading saved results...</div>';
+            list.innerHTML = `<div style="color:#7f94a3;">${appState.language === 'ko' ? '저장된 결과를 불러오는 중...' : 'Loading saved results...'}</div>`;
             try {
                 const response = await fetch('/results');
                 const items = await response.json();
                 if (!Array.isArray(items) || items.length === 0) {
-                    list.innerHTML = '<div style="color:#7f94a3;">No saved results found.</div>';
+                    list.innerHTML = `<div style="color:#7f94a3;">${appState.language === 'ko' ? '저장된 결과가 없습니다.' : 'No saved results found.'}</div>`;
                     return;
                 }
 
@@ -2194,7 +2580,7 @@
                             <div class="segment-time">${item.type} | ${modified}</div>
                         </div>
                         <div>
-                            <button class="btn btn-secondary" style="padding:8px 12px;" data-result="${item.filename}">Load</button>
+                            <button class="btn btn-secondary" style="padding:8px 12px;" data-result="${item.filename}">${appState.language === 'ko' ? '불러오기' : 'Load'}</button>
                         </div>
                     `;
                     row.querySelector('button').addEventListener('click', () => loadSavedResult(item.filename));
@@ -2202,7 +2588,7 @@
                 });
             } catch (error) {
                 console.error('History load error:', error);
-                list.innerHTML = `<div style="color:#f44336;">Failed to load history: ${error.message}</div>`;
+                list.innerHTML = `<div style="color:#f44336;">${appState.language === 'ko' ? '이력 로드 실패: ' : 'Failed to load history: '}${error.message}</div>`;
             }
         }
 
@@ -2317,7 +2703,9 @@
                 ? actSummary.total_duration
                 : (actSummary.walking || 0) + (actSummary.resting || 0) + (actSummary.task || 0) + (actSummary.standing || 0);
             document.getElementById('personCount').textContent =
-                `${results.n_persons} person(s) detected | Total activity: ${totalAct.toFixed(1)}s`;
+                appState.language === 'ko'
+                    ? `${results.n_persons}명 감지 | 총 활동 시간: ${totalAct.toFixed(1)}초`
+                    : `${results.n_persons} person(s) detected | Total activity: ${totalAct.toFixed(1)}s`;
 
             // Create person tabs
             const personTabs = document.getElementById('personTabs');
@@ -2368,7 +2756,7 @@
             timeline.innerHTML = '';
             const duration = totalDuration || 0;
             if (!Array.isArray(segments) || segments.length === 0 || duration <= 0) {
-                timeline.innerHTML = '<div style="padding:10px;color:#7f94a3;">No timeline segments available.</div>';
+                timeline.innerHTML = `<div style="padding:10px;color:#7f94a3;">${appState.language === 'ko' ? '사용 가능한 타임라인 세그먼트가 없습니다.' : 'No timeline segments available.'}</div>`;
                 return;
             }
 
@@ -2388,7 +2776,7 @@
                     cursor: pointer;
                     transition: opacity 0.2s;
                 `;
-                div.title = `${label}: ${(seg.start_time || 0).toFixed(1)}s - ${(seg.end_time || 0).toFixed(1)}s`;
+                div.title = `${translateActivityLabel(label)}: ${(seg.start_time || 0).toFixed(1)}s - ${(seg.end_time || 0).toFixed(1)}s`;
                 div.onmouseover = () => div.style.opacity = '0.8';
                 div.onmouseout = () => div.style.opacity = '1';
                 div.onclick = () => {
@@ -2414,7 +2802,9 @@
             const totalDuration = gaitSummary.total_duration !== undefined
                 ? gaitSummary.total_duration
                 : (person.duration || symptomResults?.video_info?.duration || 0);
-            document.getElementById('totalDuration').textContent = 'Total: ' + totalDuration.toFixed(1) + 's';
+            document.getElementById('totalDuration').textContent = appState.language === 'ko'
+                ? `총합: ${totalDuration.toFixed(1)}초`
+                : 'Total: ' + totalDuration.toFixed(1) + 's';
 
             renderTimeline(
                 'activityTimeline',
@@ -2427,9 +2817,20 @@
                 }
             );
             renderSegmentList('activitySegmentList', gaitTimeline.segments || [], {
-                labelFn: (seg, idx) => `${idx + 1}. ${((seg.activity_type || seg.label || 'segment')).replace('_', ' ')}`,
+                labelFn: (seg, idx) => `${idx + 1}. ${translateActivityLabel((seg.activity_type || seg.label || 'segment').replace('_', ' '))}`,
                 metaFn: (seg) => `${(seg.start_time || 0).toFixed(1)}s - ${(seg.end_time || 0).toFixed(1)}s | ${((seg.end_time || 0) - (seg.start_time || 0)).toFixed(1)}s`,
             });
+        }
+
+        function translateActivityLabel(label) {
+            const normalized = String(label || '').replace('_', ' ').toLowerCase();
+            if (appState.language !== 'ko') return normalized;
+            if (normalized === 'walking') return '보행';
+            if (normalized === 'turning') return '회전';
+            if (normalized === 'standing') return '정지';
+            if (normalized === 'resting') return '휴식';
+            if (normalized === 'task') return '과제';
+            return normalized;
         }
 
         function selectPerson(personId) {
@@ -2460,7 +2861,9 @@
             });
             let maxSeverity = severities.reduce((max, s) =>
                 severityOrder[s] > severityOrder[max] ? s : max, 'normal');
-            let classificationSub = `${person.person_id} | Duration: ${person.duration.toFixed(1)}s`;
+            let classificationSub = appState.language === 'ko'
+                ? `${person.person_id} | 길이: ${person.duration.toFixed(1)}초`
+                : `${person.person_id} | Duration: ${person.duration.toFixed(1)}s`;
 
             const gaitSummary = symptomResults?.gait_analysis?.summary || {};
             const isGaitSourcePerson = getAnalysisSourcePersonId() === person.person_id;
@@ -2474,10 +2877,14 @@
                 if (severityOrder[gaitSeverity] > severityOrder[maxSeverity]) {
                     maxSeverity = gaitSeverity;
                 }
-                classificationSub = `${person.person_id} | Gait source | ${gaitSummary.overall_classification || 'Gait summary available'}`;
+                classificationSub = appState.language === 'ko'
+                    ? `${person.person_id} | Gait source | ${gaitSummary.overall_classification || '보행 요약 사용 가능'}`
+                    : `${person.person_id} | Gait source | ${gaitSummary.overall_classification || 'Gait summary available'}`;
             } else if (person?.symptoms?.gait?.summary?.overall_severity && severities.length === 0) {
                 maxSeverity = person.symptoms.gait.summary.overall_severity;
-                classificationSub = `${person.person_id} | Gait symptom summary`;
+                classificationSub = appState.language === 'ko'
+                    ? `${person.person_id} | 보행 증상 요약`
+                    : `${person.person_id} | Gait symptom summary`;
             }
 
             // Update classification box
@@ -2532,9 +2939,9 @@
                 document.getElementById('gaitHesitantTurns').textContent = '-';
                 document.getElementById('gaitFogTurns').textContent = '-';
                 document.getElementById('gaitWalkingTurns').textContent = '-';
-                document.getElementById('gaitModelChip').textContent = 'HGB side signal: no data';
+                document.getElementById('gaitModelChip').textContent = appState.language === 'ko' ? 'HGB 보조 신호: 데이터 없음' : 'HGB side signal: no data';
                 document.getElementById('gaitModelChip').className = 'gait-chip';
-                document.getElementById('gaitPipelineChip').textContent = 'Pipeline: no data';
+                document.getElementById('gaitPipelineChip').textContent = appState.language === 'ko' ? '파이프라인: 데이터 없음' : 'Pipeline: no data';
                 document.getElementById('gaitPipelineChip').className = 'gait-chip';
                 return;
             }
@@ -2604,12 +3011,18 @@
             if (hgbRuntime.available && hgbRuntime.prob_pd !== undefined && hgbRuntime.prob_pd !== null) {
                 const runtimeLabel = hgbRuntime.pred_label || 'available';
                 document.getElementById('gaitHgbRuntime').textContent = `${(hgbRuntime.prob_pd * 100).toFixed(0)}% (${runtimeLabel})`;
-                document.getElementById('gaitModelChip').textContent = `HGB side signal: ${runtimeLabel}`;
+                document.getElementById('gaitModelChip').textContent = appState.language === 'ko'
+                    ? `HGB 보조 신호: ${runtimeLabel}`
+                    : `HGB side signal: ${runtimeLabel}`;
                 document.getElementById('gaitModelChip').className = 'gait-chip ok';
             } else {
-                const hgbReason = hgbRuntime.error === 'missing_model_artifact' ? 'No model file' : 'Unavailable';
+                const hgbReason = hgbRuntime.error === 'missing_model_artifact'
+                    ? (appState.language === 'ko' ? '모델 파일 없음' : 'No model file')
+                    : (appState.language === 'ko' ? '사용 불가' : 'Unavailable');
                 document.getElementById('gaitHgbRuntime').textContent = `N/A (${hgbReason})`;
-                document.getElementById('gaitModelChip').textContent = `HGB side signal: ${hgbReason}`;
+                document.getElementById('gaitModelChip').textContent = appState.language === 'ko'
+                    ? `HGB 보조 신호: ${hgbReason}`
+                    : `HGB side signal: ${hgbReason}`;
                 document.getElementById('gaitModelChip').className = 'gait-chip warn';
             }
 
@@ -2617,11 +3030,13 @@
                 const checks = preprocessing.checks || {};
                 const ok = checks.detection_rate_ok && checks.mean_pose_quality_ok;
                 document.getElementById('gaitPipelineChip').textContent =
-                    `Pipeline: ${ok ? 'applied' : 'applied*'}`;
+                    appState.language === 'ko'
+                        ? `파이프라인: ${ok ? '적용됨' : '적용됨*'}`
+                        : `Pipeline: ${ok ? 'applied' : 'applied*'}`;
                 document.getElementById('gaitPipelineChip').className =
                     'gait-chip ' + (ok ? 'ok' : 'warn');
             } else {
-                document.getElementById('gaitPipelineChip').textContent = 'Pipeline: unavailable';
+                document.getElementById('gaitPipelineChip').textContent = appState.language === 'ko' ? '파이프라인: 사용 불가' : 'Pipeline: unavailable';
                 document.getElementById('gaitPipelineChip').className = 'gait-chip warn';
             }
 
@@ -2694,7 +3109,7 @@
             listEl.innerHTML = '';
 
             if (transitions.length === 0) {
-                listEl.innerHTML = '<div style="color: #7f94a3; padding: 10px;">전환점이 감지되지 않았습니다.</div>';
+                listEl.innerHTML = `<div style="color: #7f94a3; padding: 10px;">${appState.language === 'ko' ? '전환점이 감지되지 않았습니다.' : 'No transition events detected.'}</div>`;
                 return;
             }
 
@@ -2714,14 +3129,12 @@
                 // Support both old (metadata.transition_type) and new (type/transition_type) formats
                 const transType = trans.type || trans.metadata?.transition_type || trans.transition_type || 'unknown';
                 const transLabel = (transType === 'initiation' || transType === 'gait_initiation' || transType === 'standing_to_walking')
-                    ? '🚶 보행 시작' : '🧍 보행 종료';
+                    ? (appState.language === 'ko' ? '🚶 보행 시작' : '🚶 Gait Start')
+                    : (appState.language === 'ko' ? '🧍 보행 종료' : '🧍 Gait Stop');
                 const severity = result?.severity || 'unknown';
                 const severityClass = severity === 'normal' ? 'normal' :
                                      severity === 'mild' ? 'warning' : 'danger';
-                const severityKr = severity === 'normal' ? '정상' :
-                                   severity === 'mild' ? '경미' :
-                                   severity === 'moderate' ? '중등도' :
-                                   severity === 'severe' ? '심함' : '-';
+                const severityLabel = translateSeverity(severity);
 
                 // Get key metrics
                 const hesitation = result?.metrics?.hesitation_ratio;
@@ -2730,7 +3143,11 @@
                 // Support both old (start_time/end_time) and new (boundary_time) formats
                 const startTime = trans.boundary_time || trans.start_time || 0;
                 const endTime = trans.end_time || (trans.analysis_window?.end) || (startTime + 2);
-                const standingDur = trans.standing_duration ? ` (서기: ${trans.standing_duration.toFixed(1)}s)` : '';
+                const standingDur = trans.standing_duration
+                    ? (appState.language === 'ko'
+                        ? ` (서기: ${trans.standing_duration.toFixed(1)}s)`
+                        : ` (standing: ${trans.standing_duration.toFixed(1)}s)`)
+                    : '';
 
                 div.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2739,9 +3156,9 @@
                             <div class="segment-time">${startTime.toFixed(1)}s${standingDur}</div>
                         </div>
                         <div style="text-align: right;">
-                            ${hesitation !== undefined ? `<span style="margin-right: 10px;">주저함: ${(hesitation * 100).toFixed(0)}%</span>` : ''}
-                            ${delay !== undefined && delay > 0 ? `<span style="margin-right: 10px;">지연: ${delay.toFixed(1)}s</span>` : ''}
-                            <span class="segment-status ${severityClass}">${severityKr}</span>
+                            ${hesitation !== undefined ? `<span style="margin-right: 10px;">${appState.language === 'ko' ? '주저함' : 'Hesitation'}: ${(hesitation * 100).toFixed(0)}%</span>` : ''}
+                            ${delay !== undefined && delay > 0 ? `<span style="margin-right: 10px;">${appState.language === 'ko' ? '지연' : 'Delay'}: ${delay.toFixed(1)}s</span>` : ''}
+                            <span class="segment-status ${severityClass}">${severityLabel}</span>
                         </div>
                     </div>
                 `;
@@ -2758,13 +3175,13 @@
                 severityEl.textContent = '-';
                 const breakdown = getRoutingSummary(person);
                 if (prefix === 'tremor' && (breakdown.resting || 0) <= 0) {
-                    statusEl.textContent = 'No resting segment';
+                    statusEl.textContent = appState.language === 'ko' ? '휴식 구간 없음' : 'No resting segment';
                 } else if (prefix === 'brady' && (breakdown.task || 0) <= 0) {
-                    statusEl.textContent = 'No task segment';
+                    statusEl.textContent = appState.language === 'ko' ? '과제 구간 없음' : 'No task segment';
                 } else if (prefix === 'fog' && (person?.n_fog_transitions || 0) <= 0) {
-                    statusEl.textContent = 'No transition';
+                    statusEl.textContent = appState.language === 'ko' ? '전환 없음' : 'No transition';
                 } else {
-                    statusEl.textContent = 'No data';
+                    statusEl.textContent = appState.language === 'ko' ? '데이터 없음' : 'No data';
                 }
                 statusEl.className = 'result-status';
                 boxEl.className = 'result-box';
@@ -2774,8 +3191,8 @@
             const severity = symptomData.summary.overall_severity;
             const nSegments = symptomData.summary.n_segments;
 
-            severityEl.textContent = severity.charAt(0).toUpperCase() + severity.slice(1);
-            statusEl.textContent = `${nSegments} segments`;
+            severityEl.textContent = translateSeverity(severity);
+            statusEl.textContent = appState.language === 'ko' ? `${nSegments}개 세그먼트` : `${nSegments} segments`;
 
             if (severity === 'normal') {
                 severityEl.className = 'result-value normal';
@@ -2845,7 +3262,9 @@
                 // Pisa syndrome detection
                 if (symptomData.results && symptomData.results.length > 0) {
                     const hasPisa = symptomData.results.some(r => r.metrics && r.metrics.has_pisa_syndrome);
-                    document.getElementById('posturePisa').textContent = hasPisa ? 'Detected' : 'No';
+                    document.getElementById('posturePisa').textContent = hasPisa
+                        ? (appState.language === 'ko' ? '감지됨' : 'Detected')
+                        : translateYesNo(false);
                     document.getElementById('posturePisa').style.color = hasPisa ? '#ff6b6b' : '#51cf66';
 
                     // Severity reasons
@@ -2872,7 +3291,7 @@
                 document.getElementById('fogFreezeRatio').textContent =
                     stats.freeze_ratio ? (stats.freeze_ratio.mean * 100).toFixed(0) + '%' : '-';
                 document.getElementById('fogFestination').textContent =
-                    stats.has_festination ? 'Yes' : 'No';
+                    stats.has_festination ? translateYesNo(true) : translateYesNo(false);
                 document.getElementById('fogSegments').textContent = symptomData.summary.n_segments;
 
                 // Severity reasons (if available)
@@ -2894,29 +3313,29 @@
             tbody.innerHTML = '';
 
             const symptomLabels = {
-                'tremor': {'name': '🤲 Tremor', 'metrics': ['dominant_frequency', 'tremor_amplitude', 'pd_power_ratio']},
-                'bradykinesia': {'name': '🐢 Bradykinesia', 'metrics': ['avg_velocity', 'blink_rate', 'facial_movement']},
-                'posture': {'name': '🧍 Posture', 'metrics': ['trunk_forward_angle', 'lateral_lean', 'head_drop_angle']},
+                'tremor': {'name': appState.language === 'ko' ? '🤲 진전' : '🤲 Tremor', 'metrics': ['dominant_frequency', 'tremor_amplitude', 'pd_power_ratio']},
+                'bradykinesia': {'name': appState.language === 'ko' ? '🐢 운동완서' : '🐢 Bradykinesia', 'metrics': ['avg_velocity', 'blink_rate', 'facial_movement']},
+                'posture': {'name': appState.language === 'ko' ? '🧍 자세' : '🧍 Posture', 'metrics': ['trunk_forward_angle', 'lateral_lean', 'head_drop_angle']},
                 'fog': {'name': '🧊 FOG', 'metrics': ['ankle_hip_ratio', 'freeze_ratio', 'trembling_ratio']},
-                'gait': {'name': '🚶 Gait', 'metrics': ['speed_mean', 'stride_cv', 'gait_frequency']}
+                'gait': {'name': appState.language === 'ko' ? '🚶 보행' : '🚶 Gait', 'metrics': ['speed_mean', 'stride_cv', 'gait_frequency']}
             };
 
             const metricLabels = {
-                'dominant_frequency': 'Frequency (Hz)',
-                'tremor_amplitude': 'Amplitude',
-                'pd_power_ratio': 'PD Power %',
-                'avg_velocity': 'Velocity (px/s)',
-                'blink_rate': 'Blink Rate (/min)',
-                'facial_movement': 'Facial Move',
-                'trunk_forward_angle': 'Trunk Angle (°)',
-                'lateral_lean': 'Lateral Lean (px)',
-                'head_drop_angle': 'Head Drop (°)',
-                'ankle_hip_ratio': 'Ankle/Hip Ratio',
-                'freeze_ratio': 'Freeze %',
-                'trembling_ratio': 'Trembling %',
-                'speed_mean': 'Speed Mean',
-                'stride_cv': 'Stride CV (%)',
-                'gait_frequency': 'Gait Freq (Hz)'
+                'dominant_frequency': appState.language === 'ko' ? '주파수 (Hz)' : 'Frequency (Hz)',
+                'tremor_amplitude': appState.language === 'ko' ? '진폭' : 'Amplitude',
+                'pd_power_ratio': appState.language === 'ko' ? 'PD 파워 %' : 'PD Power %',
+                'avg_velocity': appState.language === 'ko' ? '속도 (px/s)' : 'Velocity (px/s)',
+                'blink_rate': appState.language === 'ko' ? '깜박임 (/min)' : 'Blink Rate (/min)',
+                'facial_movement': appState.language === 'ko' ? '안면 움직임' : 'Facial Move',
+                'trunk_forward_angle': appState.language === 'ko' ? '몸통 각도 (°)' : 'Trunk Angle (°)',
+                'lateral_lean': appState.language === 'ko' ? '측면 기울기 (px)' : 'Lateral Lean (px)',
+                'head_drop_angle': appState.language === 'ko' ? '고개 숙임 (°)' : 'Head Drop (°)',
+                'ankle_hip_ratio': appState.language === 'ko' ? '발목/엉덩이 비율' : 'Ankle/Hip Ratio',
+                'freeze_ratio': appState.language === 'ko' ? '동결 비율 %' : 'Freeze %',
+                'trembling_ratio': appState.language === 'ko' ? '떨림 비율 %' : 'Trembling %',
+                'speed_mean': appState.language === 'ko' ? '평균 속도' : 'Speed Mean',
+                'stride_cv': appState.language === 'ko' ? '보폭 CV (%)' : 'Stride CV (%)',
+                'gait_frequency': appState.language === 'ko' ? '보행 주파수 (Hz)' : 'Gait Freq (Hz)'
             };
 
             Object.keys(symptomLabels).forEach(symptomKey => {
@@ -2950,7 +3369,7 @@
                         <td>${meanStr}</td>
                         <td class="ci-range">${ciStr}</td>
                         <td>${idx === 0 ? nSegments : ''}</td>
-                        <td style="${severityClass}">${idx === 0 ? severity : ''}</td>
+                        <td style="${severityClass}">${idx === 0 ? translateSeverity(severity) : ''}</td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -2958,14 +3377,16 @@
         }
 
         function setEmptyGaitDetails(message) {
-            const fallback = message || 'No gait biomarker segments were available for this result.';
-            document.getElementById('classificationLabel').textContent = 'No Gait Segment';
+            const fallback = message || (appState.language === 'ko'
+                ? '이 결과에서는 사용 가능한 보행 바이오마커 세그먼트가 없습니다.'
+                : 'No gait biomarker segments were available for this result.');
+            document.getElementById('classificationLabel').textContent = appState.language === 'ko' ? '보행 세그먼트 없음' : 'No Gait Segment';
             document.getElementById('classificationSub').textContent = fallback;
             document.getElementById('pdRiskScore').textContent = '-';
             document.getElementById('pdRiskLevel').textContent = '-';
             document.getElementById('abnormalCount').textContent = '0';
             document.getElementById('hgbRuntimeScore').textContent = 'N/A';
-            document.getElementById('pipelineStatus').textContent = 'No data';
+            document.getElementById('pipelineStatus').textContent = appState.language === 'ko' ? '데이터 없음' : 'No data';
             document.getElementById('speedValue').textContent = '-';
             document.getElementById('strideValue').textContent = '-';
             document.getElementById('cadenceValue').textContent = '-';
@@ -2979,12 +3400,12 @@
             document.getElementById('segmentsList').innerHTML = `<div style="color:#7f94a3; padding: 12px;">${fallback}</div>`;
             document.getElementById('statsTableBody').innerHTML = '';
             document.getElementById('pdStatsTableBody').innerHTML = '';
-            document.getElementById('statsQuality').textContent = 'No data';
+            document.getElementById('statsQuality').textContent = appState.language === 'ko' ? '데이터 없음' : 'No data';
             document.getElementById('statsSegments').textContent = '0/0';
             document.getElementById('statsTotalTime').textContent = '0.0';
             document.getElementById('statsReliability').textContent = '-';
             document.getElementById('statsMinDuration').textContent = '-';
-            document.getElementById('pdStatsRiskLevel').textContent = 'No data';
+            document.getElementById('pdStatsRiskLevel').textContent = appState.language === 'ko' ? '데이터 없음' : 'No data';
             document.getElementById('pdConfidence').textContent = fallback;
             if (radarChart) {
                 radarChart.destroy();
@@ -3026,7 +3447,9 @@
             const summary = results.summary;
             const seg = results.analysis_results[0];
             if (!seg) {
-                setEmptyGaitDetails(results.error || 'No walking segment passed the gait biomarker criteria.');
+                setEmptyGaitDetails(results.error || (appState.language === 'ko'
+                    ? '보행 바이오마커 기준을 통과한 세그먼트가 없습니다.'
+                    : 'No walking segment passed the gait biomarker criteria.'));
                 return;
             }
 
@@ -3056,9 +3479,13 @@
             document.getElementById('classificationLabel').textContent = literatureClassification;
             if (hgbRuntime.available && hgbRuntime.prob_pd !== undefined && hgbRuntime.prob_pd !== null) {
                 const runtimeLabel = hgbRuntime.pred_label || 'available';
-                document.getElementById('classificationSub').textContent = `${nSegments} segments | Total: ${totalDuration.toFixed(1)}s | HGB side signal: ${runtimeLabel} ${(hgbRuntime.prob_pd * 100).toFixed(0)}%`;
+                document.getElementById('classificationSub').textContent = appState.language === 'ko'
+                    ? `${nSegments}개 세그먼트 | 총합: ${totalDuration.toFixed(1)}초 | HGB 보조 신호: ${runtimeLabel} ${(hgbRuntime.prob_pd * 100).toFixed(0)}%`
+                    : `${nSegments} segments | Total: ${totalDuration.toFixed(1)}s | HGB side signal: ${runtimeLabel} ${(hgbRuntime.prob_pd * 100).toFixed(0)}%`;
             } else {
-                document.getElementById('classificationSub').textContent = `${nSegments} segments | Total: ${totalDuration.toFixed(1)}s | HGB side signal: unavailable`;
+                document.getElementById('classificationSub').textContent = appState.language === 'ko'
+                    ? `${nSegments}개 세그먼트 | 총합: ${totalDuration.toFixed(1)}초 | HGB 보조 신호: 사용 불가`
+                    : `${nSegments} segments | Total: ${totalDuration.toFixed(1)}s | HGB side signal: unavailable`;
             }
 
             // PD Risk Score (using aggregated values with SD)
@@ -3206,8 +3633,15 @@
                 arm_swing_asymmetry: armAsym,
                 arm_swing_amplitude: armAmp
             };
-            createRadarChart(chartData);
-            createSpeedChart(chartData);
+            const chartReliability = evaluateReferenceChartReliability(results.statistical_analysis);
+            lastChartReliability = chartReliability;
+            applyReferenceChartVisibility(chartReliability);
+            createRadarChart(chartData, { showReference: chartReliability.reliable });
+            if (chartReliability.reliable) {
+                createSpeedChart(chartData);
+            } else {
+                destroySpeedChart();
+            }
 
             // Segments list
             const segmentsList = document.getElementById('segmentsList');
@@ -3238,6 +3672,100 @@
             }
         }
 
+        function evaluateReferenceChartReliability(stats) {
+            const quality = stats?.analysis_quality || 'Unknown';
+            const nSegmentsAnalyzed = Number(stats?.n_segments_analyzed || 0);
+            const totalWalkingTime = Number(stats?.total_walking_time_sec || 0);
+            const reliabilityScore = Number(stats?.reliability_score || 0);
+            const qualitySupportsReference = ['Excellent', 'Good', 'Fair'].includes(quality);
+            const reliable = qualitySupportsReference && nSegmentsAnalyzed >= 3 && totalWalkingTime >= 6;
+            const reasons = [];
+            if (!qualitySupportsReference) reasons.push(`analysis quality is ${quality}`);
+            if (nSegmentsAnalyzed < 3) reasons.push(`only ${nSegmentsAnalyzed} valid walking segment${nSegmentsAnalyzed === 1 ? '' : 's'}`);
+            if (totalWalkingTime < 6) reasons.push(`${totalWalkingTime.toFixed(1)}s total walking time`);
+            return { reliable, quality, nSegmentsAnalyzed, totalWalkingTime, reliabilityScore, reasons };
+        }
+
+        function applyReferenceChartVisibility(status) {
+            const speedCard = document.getElementById('speedChartCard');
+            const note = document.getElementById('chartConfidenceNote');
+            const profileCard = document.getElementById('profileChartCard');
+            const heading = document.getElementById('referenceComparisonHeading');
+            const bars = document.getElementById('referenceComparisonBars');
+            const legend = document.getElementById('referenceComparisonLegend');
+            updateChartConfidencePresentation(status);
+            if (status.reliable) {
+                profileCard.style.display = '';
+                speedCard.style.display = '';
+                heading.style.display = '';
+                bars.style.display = '';
+                legend.style.display = '';
+                note.style.display = 'block';
+                note.innerHTML = appState.language === 'ko'
+                    ? `<strong>해석 가이드.</strong> 이 차트는 휴리스틱 보행 추정값을 동일 스케일 기준과 비교한 요약입니다. 임상 진단 기준을 직접 대체하지 않습니다.`
+                    : `<strong>Interpretation guide.</strong> This chart summarizes heuristic gait estimates against same-scale reference targets. It should not be treated as a direct clinical diagnosis.`;
+                return;
+            }
+
+            speedCard.style.display = 'none';
+            heading.style.display = 'none';
+            bars.style.display = 'none';
+            legend.style.display = 'none';
+            note.style.display = 'block';
+            note.innerHTML = appState.language === 'ko'
+                ? `<strong>저신뢰 결과입니다.</strong> 오각형 차트는 유지하지만, 기준 비교와 속도 비교는 숨겼습니다. 이유: ${formatReliabilityReasons(status)}.`
+                : `<strong>Low-confidence result.</strong> The radar profile is kept, but reference and speed comparisons are hidden. Reason: ${formatReliabilityReasons(status)}.`;
+        }
+
+        function updateChartConfidencePresentation(status) {
+            const badge = document.getElementById('chartConfidenceBadge');
+            if (!badge) return;
+            const qualityClass = (status?.quality || 'Unknown').toLowerCase().replace(/\s+/g, '-');
+            badge.className = `confidence-badge ${qualityClass}`;
+            const reliabilityPct = Math.round(Number(status?.reliabilityScore || 0) * 100);
+            if (!status) {
+                badge.textContent = appState.language === 'ko' ? '신뢰도 -' : 'Confidence -';
+                return;
+            }
+            badge.textContent = appState.language === 'ko'
+                ? `신뢰도 ${reliabilityPct}% · ${status.quality}`
+                : `Confidence ${reliabilityPct}% · ${status.quality}`;
+        }
+
+        function formatReliabilityReasons(status) {
+            const nSegments = Number(status?.nSegmentsAnalyzed || 0);
+            const totalWalkingTime = Number(status?.totalWalkingTime || 0);
+            const reasons = [];
+            if (status?.quality === 'Poor') {
+                reasons.push(appState.language === 'ko' ? '분석 품질이 Poor입니다' : 'analysis quality is Poor');
+            }
+            if (nSegments < 3) {
+                reasons.push(appState.language === 'ko'
+                    ? `유효 보행 세그먼트가 ${nSegments}개뿐입니다`
+                    : `only ${nSegments} valid walking segment${nSegments === 1 ? '' : 's'}`);
+            }
+            if (totalWalkingTime < 6) {
+                reasons.push(appState.language === 'ko'
+                    ? `총 보행 시간이 ${totalWalkingTime.toFixed(1)}초입니다`
+                    : `${totalWalkingTime.toFixed(1)}s total walking time`);
+            }
+            return reasons.join(', ');
+        }
+
+        function destroyRadarChart() {
+            if (radarChart) {
+                radarChart.destroy();
+                radarChart = null;
+            }
+        }
+
+        function destroySpeedChart() {
+            if (speedChart) {
+                speedChart.destroy();
+                speedChart = null;
+            }
+        }
+
         function displayStatisticalAnalysis(stats) {
             // Quality badge
             const qualityBadge = document.getElementById('statsQuality');
@@ -3255,15 +3783,15 @@
             tableBody.innerHTML = '';
 
             const paramLabels = {
-                'walking_speed': 'Walking Speed (m/s)',
-                'stride_length': 'Stride Length (m)',
-                'cadence': 'Cadence (steps/min)',
-                'step_width': 'Step Width (m)',
-                'stride_time_cv': 'Stride Time CV (%)',
-                'arm_swing_asymmetry': 'Arm Swing Asym.',
-                'arm_swing_amplitude': 'Arm Swing Amp. (°)',
-                'step_time_asymmetry': 'Step Time Asym.',
-                'pd_risk_score': 'PD Risk Score'
+                'walking_speed': appState.language === 'ko' ? '보행 속도 (m/s)' : 'Walking Speed (m/s)',
+                'stride_length': appState.language === 'ko' ? '보폭 길이 (m)' : 'Stride Length (m)',
+                'cadence': appState.language === 'ko' ? '케이던스 (steps/min)' : 'Cadence (steps/min)',
+                'step_width': appState.language === 'ko' ? '보폭 너비 (m)' : 'Step Width (m)',
+                'stride_time_cv': appState.language === 'ko' ? 'Stride Time CV (%)' : 'Stride Time CV (%)',
+                'arm_swing_asymmetry': appState.language === 'ko' ? '팔 흔들림 비대칭' : 'Arm Swing Asym.',
+                'arm_swing_amplitude': appState.language === 'ko' ? '팔 흔들림 진폭 (°)' : 'Arm Swing Amp. (°)',
+                'step_time_asymmetry': appState.language === 'ko' ? '스텝 타이밍 비대칭' : 'Step Time Asym.',
+                'pd_risk_score': appState.language === 'ko' ? 'PD 위험 점수' : 'PD Risk Score'
             };
 
             const params = stats.parameters || {};
@@ -3318,9 +3846,9 @@
 
                 const indicators = pdAssess.indicators || {};
                 const indicatorLabels = {
-                    'stride_variability': { name: 'Stride Time CV', unit: '%', multiplier: 1 },
-                    'arm_swing': { name: 'Arm Swing Asymmetry', unit: '%', multiplier: 100 },
-                    'step_timing': { name: 'Step Time Asymmetry', unit: '%', multiplier: 100 }
+                    'stride_variability': { name: appState.language === 'ko' ? 'Stride Time CV' : 'Stride Time CV', unit: '%', multiplier: 1 },
+                    'arm_swing': { name: appState.language === 'ko' ? '팔 흔들림 비대칭' : 'Arm Swing Asymmetry', unit: '%', multiplier: 100 },
+                    'step_timing': { name: appState.language === 'ko' ? '스텝 타이밍 비대칭' : 'Step Time Asymmetry', unit: '%', multiplier: 100 }
                 };
 
                 Object.keys(indicatorLabels).forEach(key => {
@@ -3334,7 +3862,9 @@
                     const abnormalPct = ind.abnormal_pct.toFixed(0) + '%';
                     const pValue = ind.p_value !== null ? ind.p_value.toFixed(3) : '-';
                     const statusClass = ind.statistically_abnormal ? 'color: #f44336;' : 'color: #4caf50;';
-                    const statusText = ind.statistically_abnormal ? '⚠️ Abnormal' : '✓ Normal';
+                    const statusText = ind.statistically_abnormal
+                        ? (appState.language === 'ko' ? '⚠️ 이상' : '⚠️ Abnormal')
+                        : (appState.language === 'ko' ? '✓ 정상' : '✓ Normal');
 
                     row.innerHTML = `
                         <td style="text-align: left;">${label.name}</td>
@@ -3349,10 +3879,10 @@
             }
         }
 
-        function createRadarChart(data) {
+        function createRadarChart(data, options = {}) {
             if (typeof Chart === 'undefined') return;
             const ctx = document.getElementById('radarChart').getContext('2d');
-            if (radarChart) radarChart.destroy();
+            destroyRadarChart();
 
             // Normalize values to 0-100 scale
             const normalize = (val, min, max) => Math.min(100, Math.max(0, ((val - min) / (max - min)) * 100));
@@ -3366,34 +3896,41 @@
                 normalize(data.arm_swing_amplitude, 0, 20)
             ];
 
-            const healthyData = [
-                normalize(1.21, 0, 1.5),
-                normalize(1.3, 0, 1.5),
-                normalize(110, 60, 140),
-                100 - normalize(2.0, 0, 10),
-                100 - normalize(0.05, 0, 0.3),
-                normalize(10, 0, 20)
-            ];
+            const datasets = [{
+                label: appState.language === 'ko' ? '현재 결과' : 'Your Result',
+                data: userData,
+                backgroundColor: 'rgba(31, 111, 178, 0.16)',
+                borderColor: '#1f6fb2',
+                borderWidth: 2,
+                pointBackgroundColor: '#1f6fb2'
+            }];
+
+            if (options.showReference) {
+                const healthyData = [
+                    normalize(1.21, 0, 1.5),
+                    normalize(1.3, 0, 1.5),
+                    normalize(110, 60, 140),
+                    100 - normalize(2.0, 0, 10),
+                    100 - normalize(0.05, 0, 0.3),
+                    normalize(10, 0, 20)
+                ];
+                datasets.push({
+                    label: appState.language === 'ko' ? '기준 참조' : 'Healthy Reference',
+                    data: healthyData,
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    borderColor: '#4caf50',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#4caf50'
+                });
+            }
 
             radarChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: ['Speed', 'Stride', 'Cadence', 'Stride Regularity', 'Arm Symmetry', 'Arm Amplitude'],
-                    datasets: [{
-                        label: 'Your Result',
-                        data: userData,
-                        backgroundColor: 'rgba(31, 111, 178, 0.16)',
-                        borderColor: '#1f6fb2',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#1f6fb2'
-                    }, {
-                        label: 'Healthy Reference',
-                        data: healthyData,
-                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                        borderColor: '#4caf50',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#4caf50'
-                    }]
+                    labels: appState.language === 'ko'
+                        ? ['속도', '보폭', '케이던스', '보폭 규칙성', '팔 대칭성', '팔 진폭']
+                        : ['Speed', 'Stride', 'Cadence', 'Stride Regularity', 'Arm Symmetry', 'Arm Amplitude'],
+                    datasets
                 },
                 options: {
                     responsive: true,
@@ -3417,14 +3954,16 @@
         function createSpeedChart(data) {
             if (typeof Chart === 'undefined') return;
             const ctx = document.getElementById('speedChart').getContext('2d');
-            if (speedChart) speedChart.destroy();
+            destroySpeedChart();
 
             speedChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Your Result (avg)', 'Healthy', 'PD (ON)', 'PD (OFF)'],
+                    labels: appState.language === 'ko'
+                        ? ['현재 결과 (평균)', '정상 기준', 'PD (ON)', 'PD (OFF)']
+                        : ['Your Result (avg)', 'Healthy', 'PD (ON)', 'PD (OFF)'],
                     datasets: [{
-                        label: 'Speed (m/s)',
+                        label: appState.language === 'ko' ? '속도 (m/s)' : 'Speed (m/s)',
                         data: [data.walking_speed, 1.21, 1.02, 0.86],
                         backgroundColor: ['#1f6fb2', '#23865c', '#b87414', '#bf4a44'],
                         borderRadius: 8
@@ -3451,7 +3990,7 @@
                 const response = await fetch('/users');
                 const users = await response.json();
                 const grid = document.getElementById('userGrid');
-                grid.innerHTML = `<div class="user-card add-user-card" onclick="openRegisterModal()"><div class="icon">➕</div><div>Add User</div></div>`;
+                grid.innerHTML = `<div class="user-card add-user-card" onclick="openRegisterModal()"><div class="icon">➕</div><div>${t('users.add', 'Add User')}</div></div>`;
                 users.forEach(user => {
                     const card = document.createElement('div');
                     card.className = 'user-card';
@@ -3475,7 +4014,7 @@
             try {
                 cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
                 document.getElementById('cameraPreview').srcObject = cameraStream;
-            } catch (error) { console.error('Camera error:', error); alert('Could not access camera'); }
+            } catch (error) { console.error('Camera error:', error); alert(appState.language === 'ko' ? '카메라에 접근할 수 없습니다' : 'Could not access camera'); }
         }
 
         function stopCamera() {
@@ -3487,7 +4026,7 @@
 
         async function captureAndRegister() {
             const name = document.getElementById('userName').value.trim();
-            if (!name) { alert('Please enter a name'); return; }
+            if (!name) { alert(appState.language === 'ko' ? '이름을 입력하세요' : 'Please enter a name'); return; }
             const video = document.getElementById('cameraPreview');
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
@@ -3502,15 +4041,16 @@
                 });
                 const result = await response.json();
                 if (result.success) {
-                    alert('User registered successfully!');
+                    alert(appState.language === 'ko' ? '사용자 등록이 완료되었습니다' : 'User registered successfully!');
                     closeRegisterModal();
                     loadUsers();
                     document.getElementById('userName').value = '';
-                } else { alert('Registration failed: ' + result.error); }
-            } catch (error) { console.error('Registration error:', error); alert('Registration failed'); }
+                } else { alert((appState.language === 'ko' ? '등록 실패: ' : 'Registration failed: ') + result.error); }
+            } catch (error) { console.error('Registration error:', error); alert(appState.language === 'ko' ? '등록에 실패했습니다' : 'Registration failed'); }
         }
 
         // Initialize
+        applyTranslations();
         loadUsers();
         preloadResultFromQuery();
     </script>

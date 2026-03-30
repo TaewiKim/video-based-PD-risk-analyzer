@@ -94,7 +94,7 @@ class TestPaperSummary:
             paper_id=paper.id,
             summary="This is a test summary.",
             key_findings="Finding 1\nFinding 2",
-            model_used="claude-sonnet-4-20250514",
+            model_used="manual",
         )
         session.add(summary)
         session.commit()

@@ -11,3 +11,20 @@ class PersonUsage(models.Model):
 class UsageEvent(models.Model):
     person = models.ForeignKey(PersonUsage, on_delete=models.CASCADE, related_name="events")
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class AnalysisResult(models.Model):
+    RESULT_TYPE_CHOICES = [
+        ("gait", "Gait"),
+        ("symptoms", "Symptoms"),
+    ]
+
+    result_filename = models.CharField(max_length=255, unique=True)
+    result_type = models.CharField(max_length=32, choices=RESULT_TYPE_CHOICES)
+    video_filename = models.CharField(max_length=255, blank=True, default="")
+    payload = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]

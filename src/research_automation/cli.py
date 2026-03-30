@@ -97,13 +97,6 @@ storage:
   datasets_dir: data/datasets
   cache_dir: data/cache
 
-claude:
-  # Set ANTHROPIC_API_KEY environment variable or add key here
-  api_key: ""
-  model: claude-sonnet-4-20250514
-  max_tokens: 4096
-  temperature: 0.3
-
 youtube:
   max_duration: 600
   preferred_quality: 720p
@@ -248,31 +241,6 @@ def lit_download(
         console.print(f"[green]Downloaded to: {path}[/green]")
     else:
         console.print("[red]Download failed. Paper may not be open access.[/red]")
-
-
-@lit_app.command("summarize")
-def lit_summarize(
-    paper_id: Annotated[int, typer.Option("--paper-id", "-p", help="Paper ID from database")],
-    focus: Annotated[
-        Optional[str], typer.Option("--focus", "-f", help="Focus areas (comma-separated)")
-    ] = None,
-):
-    """Summarize a paper using Claude."""
-    from research_automation.core.database import init_db
-    from research_automation.literature.summarize import format_summary_markdown, summarize_paper
-
-    init_db()
-
-    focus_areas = [f.strip() for f in focus.split(",")] if focus else None
-
-    with console.status("Generating summary..."):
-        try:
-            summary = summarize_paper(paper_id, focus_areas)
-        except ValueError as e:
-            console.print(f"[red]{e}[/red]")
-            raise typer.Exit(1)
-
-    console.print(format_summary_markdown(summary))
 
 
 @lit_app.command("list")

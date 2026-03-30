@@ -4,7 +4,7 @@ Video-based health monitoring research automation toolkit.
 
 ## Features
 
-- **Literature Module**: Search, download, and summarize research papers from PubMed, arXiv, Semantic Scholar
+- **Literature Module**: Search and download research papers from PubMed, arXiv, Semantic Scholar
 - **Collection Module**: YouTube video search/download, quality assessment, dataset management
 - **Clinical Scales**: MDS-UPDRS, Hoehn & Yahr, House-Brackmann and more
 - **ECG Processing**: Load and analyze ECG signals (optional)
@@ -48,6 +48,7 @@ Production notes:
 - `scripts/run_django_server.sh` runs `collectstatic` and starts Gunicorn with the production settings module.
 - Static files are served in production via WhiteNoise.
 - API surface summary: [`docs/API_REFERENCE.md`](/workspace/video-based-PD-risk-analyzer/docs/API_REFERENCE.md)
+- Local development setup: [`docs/DEVELOPMENT_SETUP.md`](/workspace/video-based-PD-risk-analyzer/docs/DEVELOPMENT_SETUP.md)
 
 ## Quick Start
 
@@ -80,7 +81,6 @@ research collect scale show MDS-UPDRS-III
 Set environment variables or edit `config/settings.yaml`:
 
 ```bash
-export ANTHROPIC_API_KEY="your-key"
 export PUBMED_EMAIL="your@email.com"
 ```
 
@@ -108,8 +108,8 @@ RF baseline vs CARE-PD official 코드 직접 실행/비교 절차는 아래 문
 ```
 research-automation/
 ├── src/research_automation/
-│   ├── core/           # Config, database, storage, Claude API
-│   ├── literature/     # Paper search, download, summarization
+│   ├── core/           # Config, database, storage
+│   ├── literature/     # Paper search, download, extraction
 │   ├── collection/     # Video collection, quality, datasets
 │   └── cli.py          # Typer CLI application
 ├── config/

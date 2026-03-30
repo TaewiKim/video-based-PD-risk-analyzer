@@ -47,21 +47,6 @@ class StorageConfig:
 
 
 @dataclass
-class ClaudeConfig:
-    """Claude API configuration."""
-
-    api_key: str = ""
-    model: str = "claude-sonnet-4-20250514"
-    max_tokens: int = 4096
-    temperature: float = 0.3
-
-    def __post_init__(self) -> None:
-        """Load API key from environment if not set."""
-        if not self.api_key:
-            self.api_key = os.getenv("ANTHROPIC_API_KEY", "")
-
-
-@dataclass
 class YouTubeConfig:
     """YouTube download configuration."""
 
@@ -92,7 +77,6 @@ class Settings:
 
     database: DatabaseConfig = field(default_factory=DatabaseConfig)
     storage: StorageConfig = field(default_factory=StorageConfig)
-    claude: ClaudeConfig = field(default_factory=ClaudeConfig)
     youtube: YouTubeConfig = field(default_factory=YouTubeConfig)
     search: SearchConfig = field(default_factory=SearchConfig)
 
@@ -114,7 +98,6 @@ class Settings:
         return cls(
             database=DatabaseConfig(**data.get("database", {})),
             storage=StorageConfig(**data.get("storage", {})),
-            claude=ClaudeConfig(**data.get("claude", {})),
             youtube=YouTubeConfig(**data.get("youtube", {})),
             search=SearchConfig(**data.get("search", {})),
         )

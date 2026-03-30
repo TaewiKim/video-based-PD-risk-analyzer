@@ -8,7 +8,6 @@ Track experiments, log metrics, and manage model artifacts.
 from __future__ import annotations
 
 import json
-import os
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
@@ -19,6 +18,44 @@ import mlflow
 from mlflow.tracking import MlflowClient
 
 
+DEFAULT_TRACKING_ROOT = Path("mlruns")
+
+
+def default_tracking_uri() -> str:
+    """Return the default MLflow tracking URI using a local SQLite backend."""
+    db_path = (DEFAULT_TRACKING_ROOT / "mlflow.db").absolute()
+    return f"sqlite:///{db_path}"
+
+
+def _normalize_tracking_uri(raw_tracking_uri: str) -> tuple[str, Path | None]:
+    raw = (raw_tracking_uri or "").strip()
+    if not raw:
+        return default_tracking_uri(), DEFAULT_TRACKING_ROOT.absolute()
+    if raw.startswith("sqlite:///"):
+        db_path = Path(raw.removeprefix("sqlite:///")).absolute()
+        return raw, db_path.parent
+    if raw.startswith(("http://", "https://", "postgresql://", "mysql://")):
+        return raw, None
+    if raw.startswith("file://"):
+        # Backward-compatible explicit file-store URI.
+        return raw, None
+
+    local_path = Path(raw).absolute()
+    if local_path.suffix == ".db":
+        return f"sqlite:///{local_path}", local_path.parent
+    return f"sqlite:///{local_path / 'mlflow.db'}", local_path
+
+
+def _normalize_artifact_location(raw_artifact_location: str | None, tracking_root: Path | None) -> str | None:
+    if raw_artifact_location:
+        if raw_artifact_location.startswith(("file://", "s3://", "gs://", "runs:/", "mlflow-artifacts:/")):
+            return raw_artifact_location
+        return f"file://{Path(raw_artifact_location).absolute()}"
+    if tracking_root is None:
+        return None
+    return f"file://{(tracking_root / 'artifacts').absolute()}"
+
+
 @dataclass
 class ExperimentConfig:
     """Configuration for an experiment."""
@@ -26,13 +63,12 @@ class ExperimentConfig:
     name: str
     description: str = ""
     tags: dict[str, str] = field(default_factory=dict)
-    tracking_uri: str = "mlruns"
+    tracking_uri: str = field(default_factory=default_tracking_uri)
     artifact_location: str | None = None
 
     def __post_init__(self):
-        if not self.tracking_uri.startswith(("http://", "https://", "file://")):
-            # Local directory
-            self.tracking_uri = f"file://{Path(self.tracking_uri).absolute()}"
+        self.tracking_uri, tracking_root = _normalize_tracking_uri(self.tracking_uri)
+        self.artifact_location = _normalize_artifact_location(self.artifact_location, tracking_root)
 
 
 @dataclass
@@ -61,13 +97,13 @@ class ExperimentTracker:
     def __init__(
         self,
         experiment_name: str,
-        tracking_uri: str = "mlruns",
+        tracking_uri: str | None = None,
         description: str = "",
     ):
         self.config = ExperimentConfig(
             name=experiment_name,
             description=description,
-            tracking_uri=tracking_uri,
+            tracking_uri=tracking_uri or default_tracking_uri(),
         )
         self._client: MlflowClient | None = None
         self._experiment_id: str | None = None
@@ -279,7 +315,7 @@ def run_experiment(
     run_name: str,
     train_fn: callable,
     params: dict[str, Any],
-    tracking_uri: str = "mlruns",
+    tracking_uri: str | None = None,
 ) -> ExperimentResult:
     """
     Run an experiment with automatic tracking.
@@ -294,7 +330,7 @@ def run_experiment(
     Returns:
         ExperimentResult with run details
     """
-    tracker = ExperimentTracker(experiment_name, tracking_uri)
+    tracker = ExperimentTracker(experiment_name, tracking_uri or default_tracking_uri())
 
     with tracker.start_run(run_name) as run:
         tracker.log_params(params)

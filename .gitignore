@@ -21,6 +21,7 @@ data/results/
 .venv312
 .venv-mediapipe
 web/.venv312/
+.pgenv/
 
 # IDE
 .vscode/
@@ -39,6 +40,11 @@ mlruns/
 # Web runtime artifacts
 web/uploads/
 web/results/
+server/runtime/uploads/
+server/runtime/results/
+server/runtime/postgres/
+server/runtime/ui_checks/
+reports/playwright/
 
 # Config with secrets
 config/settings.local.yaml

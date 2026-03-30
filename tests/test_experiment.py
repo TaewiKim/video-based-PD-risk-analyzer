@@ -25,7 +25,9 @@ class TestExperimentConfig:
         config = ExperimentConfig(name="test-experiment")
         assert config.name == "test-experiment"
         assert config.description == ""
-        assert config.tracking_uri.startswith("file://")
+        assert config.tracking_uri.startswith("sqlite:///")
+        assert config.artifact_location is not None
+        assert config.artifact_location.startswith("file://")
 
     def test_config_with_description(self):
         """Test config with description."""
@@ -72,7 +74,7 @@ class TestExperimentTracker:
     def temp_tracking_dir(self):
         """Create temporary tracking directory."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            yield Path(tmpdir) / "mlruns"
+            yield Path(tmpdir) / "mlflow"
 
     def test_tracker_init(self, temp_tracking_dir):
         """Test tracker initialization."""
@@ -178,7 +180,7 @@ class TestExperimentResult:
             start_time=datetime.now(),
             end_time=datetime.now(),
             status="FINISHED",
-            artifact_uri="mlruns/0/abc123/artifacts",
+            artifact_uri="file:///tmp/mlflow/artifacts/abc123",
         )
 
     def test_result_attributes(self, sample_result):

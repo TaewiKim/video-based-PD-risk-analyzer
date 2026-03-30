@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
-import pytest
-
 
 class TestSettings:
     """Tests for Settings configuration."""
@@ -17,7 +13,6 @@ class TestSettings:
         settings = Settings()
 
         assert settings.database.url == "sqlite:///data/research.db"
-        assert settings.claude.model == "claude-sonnet-4-20250514"
         assert settings.youtube.max_duration == 600
 
     def test_settings_from_dict(self):
@@ -26,13 +21,11 @@ class TestSettings:
 
         data = {
             "database": {"url": "sqlite:///custom.db"},
-            "claude": {"model": "claude-opus-4-20250514"},
         }
 
         settings = Settings._from_dict(data)
 
         assert settings.database.url == "sqlite:///custom.db"
-        assert settings.claude.model == "claude-opus-4-20250514"
 
     def test_settings_to_dict(self):
         """Test settings to dictionary conversion."""
@@ -43,7 +36,6 @@ class TestSettings:
 
         assert "database" in data
         assert "storage" in data
-        assert "claude" in data
 
     def test_ensure_directories(self, temp_dir):
         """Test directory creation."""
@@ -120,29 +112,3 @@ class TestStorageManager:
         assert path1 == path2
         # Different key should give different path
         assert path1 != path3
-
-
-class TestClaudeClient:
-    """Tests for Claude client (without actual API calls)."""
-
-    def test_client_init(self):
-        """Test client initialization."""
-        from research_automation.core.claude import ClaudeClient
-        from research_automation.core.config import ClaudeConfig
-
-        config = ClaudeConfig(api_key="test_key")
-        client = ClaudeClient(config)
-
-        assert client.config.api_key == "test_key"
-        assert client.config.model == "claude-sonnet-4-20250514"
-
-    def test_client_missing_key(self):
-        """Test error on missing API key."""
-        from research_automation.core.claude import ClaudeClient
-        from research_automation.core.config import ClaudeConfig
-
-        config = ClaudeConfig(api_key="")
-        client = ClaudeClient(config)
-
-        with pytest.raises(ValueError, match="API key not set"):
-            _ = client.client
