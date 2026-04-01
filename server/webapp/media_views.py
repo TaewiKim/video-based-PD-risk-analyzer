@@ -9,6 +9,14 @@ from django.http import FileResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
+from .access_control import (
+    allowed_users,
+    can_access_user,
+    can_access_video,
+    remember_user_access,
+    remember_video_access,
+)
+from .auth_utils import api_login_required
 from .api_common import ensure_analyzers, parse_json_body
 from .runtime import ALLOWED_EXTENSIONS, PROFILE_DIR, UPLOAD_DIR
 
@@ -62,6 +70,21 @@ def _normalize_video_for_analysis(source_path, target_path):
     subprocess.run(cmd, check=True, capture_output=True)
 
 
+def _ingest_processing_metadata(source_extension: str) -> dict:
+    return {
+        "normalized_for_analysis": True,
+        "source_extension": source_extension,
+        "output_extension": "mp4",
+        "video_codec": "h264",
+        "audio_removed": True,
+        "max_side_px": ANALYSIS_MAX_SIDE,
+        "notice": (
+            "Uploaded videos are resized, transcoded to MP4/H.264, and audio is removed before analysis."
+        ),
+    }
+
+
+@api_login_required
 @csrf_exempt
 @require_POST
 def api_upload(request):
@@ -87,10 +110,18 @@ def api_upload(request):
         raw_path.unlink(missing_ok=True)
         return JsonResponse({"error": f"Failed to normalize video: {exc}"}, status=500)
     raw_path.unlink(missing_ok=True)
+    remember_video_access(request, filename)
+    return JsonResponse(
+        {
+            "success": True,
+            "filename": filename,
+            "video_url": f"/videos/{filename}",
+            "input_processing": _ingest_processing_metadata(ext),
+        }
+    )
 
-    return JsonResponse({"success": True, "filename": filename, "video_url": f"/videos/{filename}"})
 
-
+@api_login_required
 @csrf_exempt
 @require_POST
 def api_register_user(request):
@@ -114,28 +145,38 @@ def api_register_user(request):
 
         profile = analyzer.register_user(name, image)
         if profile:
+            remember_user_access(request, profile.get("user_id"))
             return JsonResponse({"success": True, "user": profile})
         return JsonResponse({"error": "Face not detected in image"}, status=400)
     except Exception as exc:
         return JsonResponse({"error": str(exc)}, status=500)
 
 
+@api_login_required
 @require_GET
 def api_users(request):
     analyzer, _ = ensure_analyzers()
-    return JsonResponse(analyzer.list_users(), safe=False)
+    visible_ids = allowed_users(request)
+    users = [user for user in analyzer.list_users() if user.get("user_id") in visible_ids]
+    return JsonResponse(users, safe=False)
 
 
+@api_login_required
 @require_GET
 def user_photo(request, user_id: str):
+    if not can_access_user(request, user_id):
+        return JsonResponse({"error": "Forbidden"}, status=403)
     photo_path = PROFILE_DIR / f"{user_id}_face.jpg"
     if not photo_path.exists():
         return JsonResponse({"error": "Photo not found"}, status=404)
     return FileResponse(open(photo_path, "rb"), content_type="image/jpeg")
 
 
+@api_login_required
 @require_GET
 def video_file(request, filename: str):
+    if not can_access_video(request, filename):
+        return JsonResponse({"error": "Forbidden"}, status=403)
     video_path = UPLOAD_DIR / filename
     if not video_path.exists():
         return JsonResponse({"error": "Video not found"}, status=404)

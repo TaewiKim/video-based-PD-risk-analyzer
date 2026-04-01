@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resend Verification | Gait Biomarker Platform</title>
+    <style>
+        :root {
+            --bg: #eef4f8;
+            --surface: #ffffff;
+            --line: #d6e2ea;
+            --text: #163042;
+            --text-soft: #587081;
+            --primary: #1f6fb2;
+            --primary-strong: #15558b;
+            --danger-bg: #fff2f1;
+            --danger-line: #f1c1bb;
+            --danger-text: #a53b36;
+            --success-bg: #eefaf4;
+            --success-line: #b9e4cb;
+            --success-text: #1b6d47;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans CJK KR", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", "Segoe UI", system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #f9fcfe 0%, var(--bg) 100%);
+            color: var(--text);
+            padding: 24px;
+        }
+        .panel {
+            width: min(100%, 420px);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 44px rgba(22, 48, 66, 0.12);
+        }
+        h1 { margin: 0 0 10px; font-size: 1.8rem; }
+        p { margin: 0 0 18px; color: var(--text-soft); line-height: 1.5; }
+        label { display: block; margin-bottom: 8px; color: var(--text-soft); }
+        input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); margin-bottom: 16px; }
+        button { width: 100%; border: none; border-radius: 12px; padding: 13px 16px; color: #fff; cursor: pointer; background: linear-gradient(135deg, var(--primary), var(--primary-strong)); }
+        .notice { margin-bottom: 16px; padding: 11px 12px; border-radius: 10px; font-size: 0.9rem; }
+        .error { border: 1px solid var(--danger-line); background: var(--danger-bg); color: var(--danger-text); }
+        .success { border: 1px solid var(--success-line); background: var(--success-bg); color: var(--success-text); }
+        a { display: inline-block; margin-top: 16px; color: var(--primary); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <form class="panel" method="post">
+        {% csrf_token %}
+        <h1>Resend Verification</h1>
+        <p>Enter the account email address to send a fresh verification link.</p>
+        {% if error %}<div class="notice error">{{ error }}</div>{% endif %}
+        {% if message %}<div class="notice success">{{ message }}</div>{% endif %}
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" required>
+        <button type="submit">Send Verification Email</button>
+        <a href="{% url 'login' %}">Back to sign in</a>
+    </form>
+</body>
+</html>

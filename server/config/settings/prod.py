@@ -16,6 +16,8 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = os.getenv("DJANGO_SECURE_HSTS_PRELOAD", "1") == "1"
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
 SECURE_SSL_REDIRECT = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "1") == "1"
 
 MIDDLEWARE = [
@@ -26,13 +28,5 @@ MIDDLEWARE = [
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB", "mydb"),
-        "USER": os.getenv("POSTGRES_USER", "admin"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
-        "HOST": os.getenv("POSTGRES_HOST", "postgres"),
-        "PORT": os.getenv("POSTGRES_PORT", "5432"),
-        "CONN_MAX_AGE": int(os.getenv("POSTGRES_CONN_MAX_AGE", "60")),
-    }
+    "default": postgres_database_config(db_name=os.getenv("POSTGRES_DB", "mydb"))  # noqa: F405
 }

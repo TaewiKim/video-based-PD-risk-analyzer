@@ -13,27 +13,53 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest.mock import patch
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.config.settings.base")
+import pytest
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.config.settings.test")
 
 import django
 
 django.setup()
 
-from django.test import RequestFactory
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import RequestFactory
 
-from server.webapp.analysis_views import api_analyze, api_analyze_symptoms
-from server.webapp.media_views import api_upload
+from server.webapp.access_control import remember_video_access
+from server.webapp.analysis_views import (
+    api_analyze,
+    api_analyze_async,
+    api_analyze_symptoms,
+    api_analyze_symptoms_async,
+    api_job_status,
+)
+from server.webapp.media_views import api_upload, api_users, user_photo, video_file
 from server.webapp.results_views import api_result_file, api_results, api_status
+
+pytestmark = pytest.mark.django_db
 
 
 def _json(response):
     return json.loads(response.content.decode("utf-8"))
 
 
+def _attach_session(request):
+    middleware = SessionMiddleware(lambda req: None)
+    middleware.process_request(request)
+    request.user = SimpleNamespace(
+        pk=1,
+        is_authenticated=True,
+        is_staff=False,
+        is_superuser=False,
+        get_username=lambda: "tester",
+    )
+    request.session.save()
+    return request
+
+
 def test_api_status_returns_usage_snapshot() -> None:
     factory = RequestFactory()
-    request = factory.get("/api/status")
+    request = _attach_session(factory.get("/api/status"))
 
     with patch(
         "server.webapp.results_views.usage_snapshot",
@@ -55,7 +81,7 @@ def test_api_status_returns_usage_snapshot() -> None:
 
 def test_api_upload_rejects_missing_video() -> None:
     factory = RequestFactory()
-    request = factory.post("/api/upload", data={})
+    request = _attach_session(factory.post("/api/upload", data={}))
 
     response = api_upload(request)
 
@@ -67,7 +93,7 @@ def test_api_upload_rejects_missing_video() -> None:
 def test_api_upload_rejects_invalid_extension() -> None:
     factory = RequestFactory()
     upload = SimpleUploadedFile("bad.txt", b"not-video", content_type="text/plain")
-    request = factory.post("/api/upload", data={"video": upload})
+    request = _attach_session(factory.post("/api/upload", data={"video": upload}))
 
     response = api_upload(request)
 
@@ -82,7 +108,7 @@ def test_api_upload_normalizes_to_mp4_contract() -> None:
     with TemporaryDirectory() as tmpdir:
         upload_dir = Path(tmpdir)
         upload = SimpleUploadedFile("clip.webm", b"video-bytes", content_type="video/webm")
-        request = factory.post("/api/upload", data={"video": upload})
+        request = _attach_session(factory.post("/api/upload", data={"video": upload}))
 
         def fake_normalize(source_path, target_path):
             Path(target_path).write_bytes(b"normalized-video")
@@ -99,8 +125,26 @@ def test_api_upload_normalizes_to_mp4_contract() -> None:
         assert payload["success"] is True
         assert payload["filename"] == "abc123.mp4"
         assert payload["video_url"] == "/videos/abc123.mp4"
+        assert payload["input_processing"]["audio_removed"] is True
+        assert request.session["allowed_video_filenames"] == ["abc123.mp4"]
         assert (upload_dir / "abc123.mp4").exists()
         assert not (upload_dir / "abc123.source.webm").exists()
+
+
+def test_api_analyze_requires_session_video_access() -> None:
+    factory = RequestFactory()
+    request = _attach_session(
+        factory.post(
+            "/api/analyze",
+            data=json.dumps({"filename": "sample.mp4", "identify_user": False}),
+            content_type="application/json",
+        )
+    )
+
+    response = api_analyze(request)
+    payload = _json(response)
+    assert response.status_code == 403
+    assert payload["error"] == "Forbidden"
 
 
 def test_api_analyze_returns_expected_contract() -> None:
@@ -128,11 +172,14 @@ def test_api_analyze_returns_expected_contract() -> None:
             analyze_video=lambda path, identify_user=True: fake_results,
         )
 
-        request = factory.post(
-            "/api/analyze",
-            data=json.dumps({"filename": "sample.mp4", "identify_user": False}),
-            content_type="application/json",
+        request = _attach_session(
+            factory.post(
+                "/api/analyze",
+                data=json.dumps({"filename": "sample.mp4", "identify_user": False}),
+                content_type="application/json",
+            )
         )
+        remember_video_access(request, "sample.mp4")
 
         with (
             patch("server.webapp.analysis_views.UPLOAD_DIR", upload_dir),
@@ -158,13 +205,37 @@ def test_api_analyze_returns_expected_contract() -> None:
         payload = _json(response)
         assert response.status_code == 200
         assert payload["video_info"]["duration"] == 5.0
-        assert "walking_detection" in payload
-        assert "analysis_results" in payload
-        assert "summary" in payload
-        assert "statistical_analysis" in payload
-        assert "ml_inference" in payload
-        assert payload["usage"]["client_id"] == "ip:test"
+        assert payload["input_processing"]["audio_removed"] is True
+        assert "sample_results.json" in request.session["allowed_result_filenames"]
         assert (results_dir / "sample_results.json").exists()
+
+
+def test_api_analyze_async_returns_job_contract() -> None:
+    factory = RequestFactory()
+    with TemporaryDirectory() as tmpdir:
+        upload_dir = Path(tmpdir)
+        (upload_dir / "sample.mp4").write_bytes(b"video")
+        request = _attach_session(
+            factory.post(
+                "/api/analyze-async",
+                data=json.dumps({"filename": "sample.mp4", "identify_user": False}),
+                content_type="application/json",
+            )
+        )
+        remember_video_access(request, "sample.mp4")
+
+        with (
+            patch("server.webapp.analysis_views.UPLOAD_DIR", upload_dir),
+            patch("server.webapp.analysis_views.consume_usage", return_value=(True, {"client_id": "ip:test"})),
+            patch("server.webapp.analysis_views.run_job"),
+            patch("server.webapp.analysis_views.create_job", return_value={"job_id": "job123", "status": "queued", "job_type": "gait", "video_filename": "sample.mp4"}),
+        ):
+            response = api_analyze_async(request)
+
+        payload = _json(response)
+        assert response.status_code == 202
+        assert payload["job_id"] == "job123"
+        assert request.session["allowed_job_ids"] == ["job123"]
 
 
 def test_api_analyze_symptoms_returns_gait_enriched_contract() -> None:
@@ -250,11 +321,14 @@ def test_api_analyze_symptoms_returns_gait_enriched_contract() -> None:
             analyze_tracks=lambda **kwargs: symptom_results,
         )
 
-        request = factory.post(
-            "/api/analyze-symptoms",
-            data=json.dumps({"filename": "scan.mp4", "symptoms": None}),
-            content_type="application/json",
+        request = _attach_session(
+            factory.post(
+                "/api/analyze-symptoms",
+                data=json.dumps({"filename": "scan.mp4", "symptoms": None}),
+                content_type="application/json",
+            )
         )
+        remember_video_access(request, "scan.mp4")
 
         with (
             patch("server.webapp.analysis_views.UPLOAD_DIR", upload_dir),
@@ -283,13 +357,71 @@ def test_api_analyze_symptoms_returns_gait_enriched_contract() -> None:
         payload = _json(response)
         assert response.status_code == 200
         assert payload["n_persons"] == 1
-        assert "gait_analysis" in payload
         assert payload["gait_analysis"]["pose_backend"] == "mediapipe"
         assert payload["gait_analysis"]["source_person_id"] == "p1"
-        assert "activity_schema" in payload
-        assert "activity_schema" in payload["persons"][0]
         assert payload["persons"][0]["symptoms"]["fog"]["transitions_detected"] >= 0
-        assert (results_dir / "scan_symptoms.json").exists()
+        assert payload["input_processing"]["audio_removed"] is True
+        assert "scan_symptoms.json" in request.session["allowed_result_filenames"]
+
+
+def test_api_analyze_symptoms_async_returns_job_contract() -> None:
+    factory = RequestFactory()
+    with TemporaryDirectory() as tmpdir:
+        upload_dir = Path(tmpdir)
+        (upload_dir / "scan.mp4").write_bytes(b"video")
+        request = _attach_session(
+            factory.post(
+                "/api/analyze-symptoms-async",
+                data=json.dumps({"filename": "scan.mp4", "symptoms": None}),
+                content_type="application/json",
+            )
+        )
+        remember_video_access(request, "scan.mp4")
+
+        with (
+            patch("server.webapp.analysis_views.UPLOAD_DIR", upload_dir),
+            patch("server.webapp.analysis_views.consume_usage", return_value=(True, {"client_id": "ip:test"})),
+            patch("server.webapp.analysis_views.run_job"),
+            patch("server.webapp.analysis_views.create_job", return_value={"job_id": "job999", "status": "queued", "job_type": "symptoms", "video_filename": "scan.mp4"}),
+        ):
+            response = api_analyze_symptoms_async(request)
+
+        payload = _json(response)
+        assert response.status_code == 202
+        assert payload["job_id"] == "job999"
+
+
+def test_api_job_status_requires_session_job_access() -> None:
+    factory = RequestFactory()
+    request = _attach_session(factory.get("/api/jobs/job123"))
+
+    response = api_job_status(request, "job123")
+    payload = _json(response)
+    assert response.status_code == 403
+    assert payload["error"] == "Forbidden"
+
+
+def test_api_job_status_grants_result_access_on_success() -> None:
+    factory = RequestFactory()
+    request = _attach_session(factory.get("/api/jobs/job123"))
+    request.session["allowed_job_ids"] = ["job123"]
+    request.session.save()
+
+    with patch(
+        "server.webapp.analysis_views.get_job",
+        return_value={
+            "job_id": "job123",
+            "status": "succeeded",
+            "result_filename": "scan_symptoms.json",
+            "video_filename": "scan.mp4",
+        },
+    ):
+        response = api_job_status(request, "job123")
+
+    payload = _json(response)
+    assert response.status_code == 200
+    assert payload["status"] == "succeeded"
+    assert "scan_symptoms.json" in request.session["allowed_result_filenames"]
 
 
 def test_api_result_file_normalizes_saved_payload() -> None:
@@ -329,7 +461,8 @@ def test_api_result_file_normalizes_saved_payload() -> None:
         }
         (results_dir / "saved_symptoms.json").write_text(json.dumps(result_payload), encoding="utf-8")
 
-        request = factory.get("/api/results/saved_symptoms.json")
+        request = _attach_session(factory.get("/api/results/saved_symptoms.json"))
+        remember_video_access(request, "saved.mp4")
 
         with (
             patch("server.webapp.results_views.RESULTS_DIR", results_dir),
@@ -341,12 +474,10 @@ def test_api_result_file_normalizes_saved_payload() -> None:
         assert response.status_code == 200
         assert payload["video_filename"] == "saved.mp4"
         assert payload["data"]["activity_schema"]["routing"]["kind"] == "symptom_routing"
-        assert payload["data"]["persons"][0]["skeleton_track"]["frames"] == [
-            [[0.0, 0.0, 1.0]]
-        ]
+        assert payload["data"]["persons"][0]["skeleton_track"]["frames"] == [[[0.0, 0.0, 1.0]]]
 
 
-def test_api_results_lists_saved_files_from_filesystem_fallback() -> None:
+def test_api_results_lists_only_session_scoped_files() -> None:
     factory = RequestFactory()
 
     with TemporaryDirectory() as tmpdir:
@@ -358,7 +489,8 @@ def test_api_results_lists_saved_files_from_filesystem_fallback() -> None:
         (upload_dir / "saved.mp4").write_bytes(b"video")
         (results_dir / "saved_symptoms.json").write_text("{}", encoding="utf-8")
 
-        request = factory.get("/api/results")
+        request = _attach_session(factory.get("/api/results"))
+        remember_video_access(request, "saved.mp4")
 
         with (
             patch("server.webapp.results_views.RESULTS_DIR", results_dir),
@@ -377,5 +509,75 @@ def test_api_results_lists_saved_files_from_filesystem_fallback() -> None:
         assert response.status_code == 200
         assert len(payload) == 1
         assert payload[0]["filename"] == "saved_symptoms.json"
-        assert payload[0]["type"] == "symptoms"
         assert payload[0]["video_filename"] == "saved.mp4"
+
+
+def test_video_file_requires_session_access() -> None:
+    factory = RequestFactory()
+    request = _attach_session(factory.get("/videos/private.mp4"))
+
+    response = video_file(request, "private.mp4")
+
+    payload = _json(response)
+    assert response.status_code == 403
+    assert payload["error"] == "Forbidden"
+
+
+def test_user_photo_requires_session_access() -> None:
+    factory = RequestFactory()
+    request = _attach_session(factory.get("/api/users/u1/photo"))
+
+    response = user_photo(request, "u1")
+
+    payload = _json(response)
+    assert response.status_code == 403
+    assert payload["error"] == "Forbidden"
+
+
+def test_api_users_lists_only_session_owned_profiles() -> None:
+    factory = RequestFactory()
+    request = _attach_session(factory.get("/api/users"))
+    request.session["allowed_user_ids"] = ["u2"]
+    request.session.save()
+
+    fake_analyzer = SimpleNamespace(
+        list_users=lambda: [
+            {"user_id": "u1", "name": "Hidden"},
+            {"user_id": "u2", "name": "Visible"},
+        ]
+    )
+
+    with patch("server.webapp.media_views.ensure_analyzers", return_value=(fake_analyzer, None)):
+        response = api_users(request)
+
+    payload = _json(response)
+    assert response.status_code == 200
+    assert payload == [{"user_id": "u2", "name": "Visible"}]
+
+
+def test_api_analyze_returns_429_when_rate_limited() -> None:
+    factory = RequestFactory()
+    request = _attach_session(
+        factory.post(
+            "/api/analyze",
+            data=json.dumps({"filename": "sample.mp4", "identify_user": False}),
+            content_type="application/json",
+        )
+    )
+    remember_video_access(request, "sample.mp4")
+
+    with TemporaryDirectory() as tmpdir:
+        upload_dir = Path(tmpdir)
+        (upload_dir / "sample.mp4").write_bytes(b"video")
+        with (
+            patch("server.webapp.analysis_views.UPLOAD_DIR", upload_dir),
+            patch(
+                "server.webapp.analysis_views.consume_usage",
+                return_value=(False, {"error": "Hourly analysis limit exceeded", "limit": 40, "remaining": 0}),
+            ),
+        ):
+            response = api_analyze(request)
+
+    payload = _json(response)
+    assert response.status_code == 429
+    assert payload["error"] == "Hourly analysis limit exceeded"

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | Gait Biomarker Platform</title>
+    <style>
+        :root {
+            --bg: #eef4f8;
+            --surface: #ffffff;
+            --line: #d6e2ea;
+            --text: #163042;
+            --text-soft: #587081;
+            --primary: #1f6fb2;
+            --primary-strong: #15558b;
+            --danger-bg: #fff2f1;
+            --danger-line: #f1c1bb;
+            --danger-text: #a53b36;
+            --shadow: 0 20px 44px rgba(22, 48, 66, 0.12);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans CJK KR", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", "Segoe UI", system-ui, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(31, 111, 178, 0.12), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(21, 85, 139, 0.08), transparent 22%),
+                linear-gradient(180deg, #fbfdff 0%, var(--bg) 100%);
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+        .auth-shell {
+            width: min(100%, 1040px);
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(340px, 420px);
+            gap: 24px;
+            align-items: stretch;
+        }
+        .intro {
+            padding: 34px;
+            border-radius: 28px;
+            background:
+                linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(240, 247, 252, 0.94));
+            border: 1px solid rgba(214, 226, 234, 0.92);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 560px;
+        }
+        .kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(31, 111, 178, 0.08);
+            color: var(--primary);
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .intro h1 {
+            margin: 0 0 12px;
+            font-size: clamp(2.4rem, 4vw, 3.5rem);
+            line-height: 0.98;
+            letter-spacing: -0.04em;
+            max-width: 10ch;
+        }
+        .intro-copy {
+            max-width: 54ch;
+            color: var(--text-soft);
+            line-height: 1.65;
+            font-size: 1rem;
+        }
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 26px;
+        }
+        .intro-metric {
+            border-radius: 18px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.78);
+            border: 1px solid var(--line);
+        }
+        .intro-metric strong {
+            display: block;
+            color: var(--text);
+            font-size: 1.15rem;
+            margin-bottom: 6px;
+        }
+        .intro-metric span {
+            color: var(--text-soft);
+            font-size: 0.84rem;
+            line-height: 1.45;
+        }
+        .panel {
+            width: min(100%, 420px);
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            padding: 30px 30px 26px;
+            align-self: center;
+        }
+        h1 {
+            margin: 0 0 8px;
+            font-size: 1.9rem;
+        }
+        h1 span {
+            color: var(--primary);
+        }
+        p {
+            margin: 0 0 22px;
+            color: var(--text-soft);
+            line-height: 1.5;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.92rem;
+            color: var(--text-soft);
+        }
+        input {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            font: inherit;
+        }
+        button {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 13px 16px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+        }
+        .error {
+            margin-bottom: 16px;
+            padding: 11px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--danger-line);
+            background: var(--danger-bg);
+            color: var(--danger-text);
+            font-size: 0.9rem;
+        }
+        .hint {
+            margin-top: 16px;
+            font-size: 0.84rem;
+            color: var(--text-soft);
+        }
+        .hint a {
+            color: #1f6fb2;
+            text-decoration: none;
+        }
+        @media (max-width: 920px) {
+            .auth-shell {
+                grid-template-columns: 1fr;
+            }
+            .intro {
+                min-height: auto;
+                padding: 28px;
+            }
+            .intro-grid {
+                grid-template-columns: 1fr;
+            }
+            .panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-shell">
+        <section class="intro">
+            <div>
+                <div class="kicker">Clinical Gait Biomarker Platform</div>
+                <h1>Gait Biomarker Platform</h1>
+                <div class="intro-copy">Sign in to access shared gait analysis, saved reviews, synchronized video playback, and downstream PD or stroke interpretation from one clinical workspace.</div>
+                <div class="intro-grid">
+                    <div class="intro-metric">
+                        <strong>Video</strong>
+                        <span>Review uploads with tracked-person context and skeleton overlays.</span>
+                    </div>
+                    <div class="intro-metric">
+                        <strong>Summary</strong>
+                        <span>Read risk, confidence, and abnormal biomarkers before opening deep evidence.</span>
+                    </div>
+                    <div class="intro-metric">
+                        <strong>History</strong>
+                        <span>Reload prior gait and symptom analyses without leaving the workspace.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <form class="panel" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <h1>Platform Sign In</h1>
+            <p>Use a Django account to access uploads, saved results, and gait biomarker analysis tools.</p>
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" autocomplete="username" value="{{ username|default:'' }}" required>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required>
+            <label style="display:flex; align-items:center; gap:8px; margin: 0 0 16px; color: var(--text-soft);">
+                <input type="checkbox" name="remember_me" style="width:auto; margin:0;" {% if remember_me %}checked{% endif %}>
+                Keep me signed in on this device
+            </label>
+            <button type="submit">Sign In</button>
+            <div class="hint"><a href="{% url 'register' %}">Create an account</a> · <a href="{% url 'resend_verification' %}">Resend verification</a> · use `python manage.py createsuperuser` for admin access.</div>
+        </form>
+    </div>
+</body>
+</html>

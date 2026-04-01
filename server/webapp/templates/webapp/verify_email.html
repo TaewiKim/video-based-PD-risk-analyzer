@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification | Gait Biomarker Platform</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Noto Sans CJK KR", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕", "Segoe UI", system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #f9fcfe 0%, #eef4f8 100%);
+            color: #163042;
+            padding: 24px;
+        }
+        .panel {
+            width: min(100%, 460px);
+            background: #fff;
+            border: 1px solid #d6e2ea;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 44px rgba(22, 48, 66, 0.12);
+        }
+        h1 { margin: 0 0 12px; font-size: 1.8rem; }
+        p { margin: 0; line-height: 1.6; color: #587081; }
+        .status {
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid;
+        }
+        .ok { background: #eefaf4; border-color: #b9e4cb; color: #1b6d47; }
+        .fail { background: #fff2f1; border-color: #f1c1bb; color: #a53b36; }
+        a { display: inline-block; margin-top: 18px; color: #1f6fb2; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <h1>Email Verification</h1>
+        <p>Account activation is completed only after the verification link is confirmed.</p>
+        <div class="status {% if success %}ok{% else %}fail{% endif %}">{{ message }}</div>
+        <a href="{% if success %}{% url 'index' %}{% else %}{% url 'resend_verification' %}{% endif %}">{% if success %}Continue{% else %}Request another link{% endif %}</a>
+    </div>
+</body>
+</html>

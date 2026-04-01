@@ -1,4 +1,8 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 
 class PersonUsage(models.Model):
@@ -28,3 +32,29 @@ class AnalysisResult(models.Model):
 
     class Meta:
         ordering = ["-updated_at"]
+
+
+class EmailVerification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="email_verifications")
+    email = models.EmailField()
+    token_hash = models.CharField(max_length=128, unique=True)
+    expires_at = models.DateTimeField()
+    consumed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["email", "created_at"]),
+            models.Index(fields=["expires_at"]),
+        ]
+
+
+class RateLimitEvent(models.Model):
+    action = models.CharField(max_length=64)
+    subject_key = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["action", "subject_key", "created_at"]),
+        ]

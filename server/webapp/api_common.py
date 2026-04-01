@@ -1,11 +1,14 @@
 import json
+from datetime import timedelta
 from typing import Any
 
 from django.utils import timezone as dj_timezone
+from django.conf import settings
 
 from .activity_schema import normalize_activity_schema
 from .models import PersonUsage as PersonUsageModel
 from .models import UsageEvent as UsageEventModel
+from .rate_limits import analysis_rules, enforce_rate_limit
 from .runtime import DATA_DIR
 from .services.pd_symptoms_analyzer import get_pd_symptoms_analyzer
 from .services.smart_analyzer import get_analyzer
@@ -36,6 +39,9 @@ def normalize_person_id(raw: str) -> str:
 
 
 def client_key(request) -> str:
+    user = getattr(request, "user", None)
+    if user is not None and getattr(user, "is_authenticated", False):
+        return f"user:{user.pk}"
     explicit = request.headers.get("X-Client-Id", "")
     if explicit.strip():
         return normalize_person_id(explicit)
@@ -49,16 +55,30 @@ def usage_snapshot(raw_client_key: str) -> dict[str, Any]:
     )
     today = dj_timezone.localdate()
     used_today = UsageEvent.objects.filter(person=person, created_at__date=today).count()
+    hour_window = dj_timezone.now() - timedelta(hours=1)
+    used_hour = UsageEvent.objects.filter(person=person, created_at__gte=hour_window).count()
     return {
         "client_id": person.person_id,
         "used_count": int(used_today),
-        "remaining": None,
-        "limit": None,
-        "unlimited": True,
+        "used_hour": int(used_hour),
+        "remaining": max(int(getattr(settings, "ANALYSIS_PER_USER_DAY", 40)) - int(used_today), 0),
+        "limit": int(getattr(settings, "ANALYSIS_PER_USER_DAY", 40)),
+        "hour_limit": int(getattr(settings, "ANALYSIS_PER_USER_HOUR", 12)),
+        "unlimited": False,
     }
 
 
 def consume_usage(raw_client_key: str) -> tuple[bool, dict[str, Any]]:
+    allowed_hour, _ = enforce_rate_limit(analysis_rules()["analysis_hour"], f"hour:{raw_client_key}")
+    if not allowed_hour:
+        snapshot = usage_snapshot(raw_client_key)
+        snapshot["error"] = "Hourly analysis limit exceeded"
+        return False, snapshot
+    allowed_day, _ = enforce_rate_limit(analysis_rules()["analysis_day"], f"day:{raw_client_key}")
+    if not allowed_day:
+        snapshot = usage_snapshot(raw_client_key)
+        snapshot["error"] = "Daily analysis limit exceeded"
+        return False, snapshot
     person, _ = PersonUsage.objects.get_or_create(
         person_id=raw_client_key, defaults={"used_count": 0}
     )

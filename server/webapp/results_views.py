@@ -4,14 +4,19 @@ from django.db.utils import OperationalError, ProgrammingError
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
+from .access_control import allowed_results, allowed_videos, can_access_result, remember_result_access
 from .activity_schema import normalize_activity_schema
+from .auth_utils import api_login_required
 from .api_common import client_key, usage_snapshot
 from .models import AnalysisResult
 from .runtime import ALLOWED_EXTENSIONS, RESULTS_DIR, UPLOAD_DIR
 
 
+@api_login_required
 @require_GET
 def api_results(request):
+    visible_videos = allowed_videos(request)
+    visible_results = allowed_results(request)
     try:
         items = [
             {
@@ -22,6 +27,8 @@ def api_results(request):
                 "modified_ts": row.updated_at.timestamp(),
             }
             for row in AnalysisResult.objects.all().order_by("-updated_at")
+            if (row.video_filename and row.video_filename in visible_videos)
+            or row.result_filename in visible_results
         ]
         return JsonResponse(items, safe=False)
     except (OperationalError, ProgrammingError):
@@ -45,14 +52,27 @@ def api_results(request):
                 "modified_ts": path.stat().st_mtime,
             }
         )
-    return JsonResponse(items, safe=False)
+    filtered = [
+        item
+        for item in items
+        if (item.get("video_filename") and item["video_filename"] in visible_videos)
+        or item["filename"] in visible_results
+    ]
+    return JsonResponse(filtered, safe=False)
 
 
+@api_login_required
 @require_GET
 def api_result_file(request, filename: str):
     try:
         row = AnalysisResult.objects.filter(result_filename=filename).first()
         if row is not None:
+            if not (
+                can_access_result(request, row.result_filename)
+                or (row.video_filename and row.video_filename in allowed_videos(request))
+            ):
+                return JsonResponse({"error": "Forbidden"}, status=403)
+            remember_result_access(request, row.result_filename)
             payload = normalize_activity_schema(row.payload)
             return JsonResponse(
                 {
@@ -79,6 +99,9 @@ def api_result_file(request, filename: str):
         if candidate.exists():
             video_filename = candidate.name
             break
+    if not (can_access_result(request, filename) or (video_filename and video_filename in allowed_videos(request))):
+        return JsonResponse({"error": "Forbidden"}, status=403)
+    remember_result_access(request, filename)
 
     return JsonResponse(
         {
@@ -89,6 +112,7 @@ def api_result_file(request, filename: str):
     )
 
 
+@api_login_required
 @require_GET
 def api_status(request):
     return JsonResponse(usage_snapshot(client_key(request)))

@@ -35,7 +35,15 @@ except ImportError:
     import importlib.util
     import sys
 
-    pose_path = Path(__file__).resolve().parents[3] / "src" / "research_automation" / "pipeline" / "extractors" / "pose.py"
+    src_root = Path(__file__).resolve().parents[3] / "src"
+    candidate_paths = [
+        src_root / "research_automation" / "pipeline" / "extractors" / "pose.py",
+        src_root / "gait-analyzer" / "pipeline" / "extractors" / "pose.py",
+    ]
+    pose_path = next((path for path in candidate_paths if path.exists()), None)
+    if pose_path is None:
+        raise
+
     spec = importlib.util.spec_from_file_location("research_automation_pose_extractor", pose_path)
     if spec is None or spec.loader is None:
         raise
