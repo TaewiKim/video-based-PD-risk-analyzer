@@ -2,6 +2,43 @@ from __future__ import annotations
 
 from typing import Any
 
+DEFAULT_STROKE_GAIT_THRESHOLDS: dict[str, Any] = {
+    "speed": {"moderate": 0.8, "high": 0.4},
+    "cadence": {"moderate": 100.0, "high": 90.0},
+    "asymmetry": {"moderate": 0.2, "high": 0.35},
+    "stability": {"moderate": 0.2, "high": 0.08},
+    "tug_seconds": {"moderate": 13.5, "high": 20.0},
+    "turn_duration_seconds": {"moderate": 2.8, "high": 4.0},
+    "visual_gait_assessment": {"moderate": 1.5, "high": 2.5},
+    "stride_time_cv": {"moderate": 4.0, "high": 8.0},
+    "step_time_asymmetry": {"moderate": 0.05, "high": 0.08},
+    "pattern_level": {"moderate_min": 2, "high_min": 5},
+}
+
+VOISARD_HS_CALIBRATED_THRESHOLDS: dict[str, Any] = {
+    "speed": {"moderate": 0.72, "high": 0.35},
+    "cadence": {"moderate": 96.0, "high": 84.0},
+    "asymmetry": {"moderate": 0.22, "high": 0.38},
+    "stability": {"moderate": 0.16, "high": 0.06},
+    "tug_seconds": {"moderate": 15.0, "high": 22.0},
+    "turn_duration_seconds": {"moderate": 3.0, "high": 4.4},
+    "visual_gait_assessment": {"moderate": 2.0, "high": 3.0},
+    "stride_time_cv": {"moderate": 5.5, "high": 9.5},
+    "step_time_asymmetry": {"moderate": 0.06, "high": 0.09},
+    "pattern_level": {"moderate_min": 2, "high_min": 6},
+}
+
+VIDEO_ONLY_THRESHOLD_PROFILES: dict[str, dict[str, Any]] = {
+    "default": DEFAULT_STROKE_GAIT_THRESHOLDS,
+    "voisard_hs_calibrated": VOISARD_HS_CALIBRATED_THRESHOLDS,
+}
+
+
+CLINICAL_AUGMENTED_THRESHOLD_PROFILES: dict[str, dict[str, Any]] = {
+    "default": DEFAULT_STROKE_GAIT_THRESHOLDS,
+    "voisard_hs_calibrated": VOISARD_HS_CALIBRATED_THRESHOLDS,
+}
+
 
 def _score_threshold(value: float, moderate_threshold: float, high_threshold: float, direction: str) -> int:
     if direction == "lt":
@@ -38,7 +75,27 @@ def _build_domain_result(
     }
 
 
-def build_stroke_gait_analysis(summary: dict[str, Any] | None) -> dict[str, Any]:
+def _resolve_thresholds(thresholds: dict[str, Any] | None) -> dict[str, Any]:
+    merged = {
+        key: value.copy() if isinstance(value, dict) else value
+        for key, value in DEFAULT_STROKE_GAIT_THRESHOLDS.items()
+    }
+    for key, value in (thresholds or {}).items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key].update(value)
+        else:
+            merged[key] = value
+    return merged
+
+
+def build_stroke_gait_analysis(
+    summary: dict[str, Any] | None,
+    *,
+    thresholds: dict[str, Any] | None = None,
+    include_clinical_metadata: bool = True,
+) -> dict[str, Any]:
+    config = _resolve_thresholds(thresholds)
+    clinical_enabled = include_clinical_metadata
     if not summary:
         return {
             "available": False,
@@ -65,62 +122,133 @@ def build_stroke_gait_analysis(summary: dict[str, Any] | None) -> dict[str, Any]
     cadence = float(summary.get("avg_cadence", 0.0) or 0.0)
     stride_time_cv = float(summary.get("avg_stride_time_cv", 0.0) or 0.0)
     step_time_asymmetry = float(summary.get("avg_step_time_asymmetry", 0.0) or 0.0)
+    tug_seconds = float(summary.get("tug_seconds", 0.0) or 0.0)
+    turn_duration_seconds = float(summary.get("turn_duration_seconds", 0.0) or 0.0)
+    visual_gait_assessment = float(summary.get("visual_gait_assessment", 0.0) or 0.0)
 
     indicators: dict[str, dict[str, Any]] = {
-        "slow_speed": {
-            "label": "Slow walking speed",
-            "value": round(speed, 3),
-            "moderate_threshold": 0.8,
-            "high_threshold": 0.4,
-            "direction": "lt",
-            "score": _score_threshold(speed, 0.8, 0.4, "lt"),
-            "unit": "m/s",
-        },
         "gait_asymmetry": {
             "label": "Marked gait asymmetry",
             "value": round(asymmetry, 3),
-            "moderate_threshold": 0.2,
-            "high_threshold": 0.35,
+            "moderate_threshold": config["asymmetry"]["moderate"],
+            "high_threshold": config["asymmetry"]["high"],
             "direction": "gt",
-            "score": _score_threshold(asymmetry, 0.2, 0.35, "gt"),
+            "score": _score_threshold(
+                asymmetry,
+                config["asymmetry"]["moderate"],
+                config["asymmetry"]["high"],
+                "gt",
+            ),
             "unit": "ratio",
         },
         "low_stability": {
             "label": "Low gait stability",
             "value": round(stability, 3),
-            "moderate_threshold": 0.2,
-            "high_threshold": 0.08,
+            "moderate_threshold": config["stability"]["moderate"],
+            "high_threshold": config["stability"]["high"],
             "direction": "lt",
-            "score": _score_threshold(stability, 0.2, 0.08, "lt"),
+            "score": _score_threshold(
+                stability,
+                config["stability"]["moderate"],
+                config["stability"]["high"],
+                "lt",
+            ),
             "unit": "score",
         },
         "low_cadence": {
             "label": "Reduced cadence",
             "value": round(cadence, 1),
-            "moderate_threshold": 100.0,
-            "high_threshold": 90.0,
+            "moderate_threshold": config["cadence"]["moderate"],
+            "high_threshold": config["cadence"]["high"],
             "direction": "lt",
-            "score": _score_threshold(cadence, 100.0, 90.0, "lt"),
+            "score": _score_threshold(
+                cadence,
+                config["cadence"]["moderate"],
+                config["cadence"]["high"],
+                "lt",
+            ),
             "unit": "steps/min",
         },
         "stride_variability": {
             "label": "High stride-time variability",
             "value": round(stride_time_cv, 2),
-            "moderate_threshold": 4.0,
-            "high_threshold": 8.0,
+            "moderate_threshold": config["stride_time_cv"]["moderate"],
+            "high_threshold": config["stride_time_cv"]["high"],
             "direction": "gt",
-            "score": _score_threshold(stride_time_cv, 4.0, 8.0, "gt"),
+            "score": _score_threshold(
+                stride_time_cv,
+                config["stride_time_cv"]["moderate"],
+                config["stride_time_cv"]["high"],
+                "gt",
+            ),
             "unit": "%",
         },
         "step_timing_asymmetry": {
             "label": "Step-time asymmetry",
             "value": round(step_time_asymmetry, 3),
-            "moderate_threshold": 0.05,
-            "high_threshold": 0.08,
+            "moderate_threshold": config["step_time_asymmetry"]["moderate"],
+            "high_threshold": config["step_time_asymmetry"]["high"],
             "direction": "gt",
-            "score": _score_threshold(step_time_asymmetry, 0.05, 0.08, "gt"),
+            "score": _score_threshold(
+                step_time_asymmetry,
+                config["step_time_asymmetry"]["moderate"],
+                config["step_time_asymmetry"]["high"],
+                "gt",
+            ),
             "unit": "ratio",
         },
+    }
+    if clinical_enabled:
+        indicators["prolonged_tug"] = {
+            "label": "Prolonged TUG",
+            "value": round(tug_seconds, 2),
+            "moderate_threshold": config["tug_seconds"]["moderate"],
+            "high_threshold": config["tug_seconds"]["high"],
+            "direction": "gt",
+            "score": _score_threshold(
+                tug_seconds,
+                config["tug_seconds"]["moderate"],
+                config["tug_seconds"]["high"],
+                "gt",
+            ),
+            "unit": "s",
+        }
+        indicators["prolonged_turn_duration"] = {
+            "label": "Prolonged turn duration",
+            "value": round(turn_duration_seconds, 2),
+            "moderate_threshold": config["turn_duration_seconds"]["moderate"],
+            "high_threshold": config["turn_duration_seconds"]["high"],
+            "direction": "gt",
+            "score": _score_threshold(
+                turn_duration_seconds,
+                config["turn_duration_seconds"]["moderate"],
+                config["turn_duration_seconds"]["high"],
+                "gt",
+            ),
+            "unit": "s",
+        }
+        indicators["visual_gait_burden"] = {
+            "label": "Elevated visual gait assessment",
+            "value": round(visual_gait_assessment, 2),
+            "moderate_threshold": config["visual_gait_assessment"]["moderate"],
+            "high_threshold": config["visual_gait_assessment"]["high"],
+            "direction": "gt",
+            "score": _score_threshold(
+                visual_gait_assessment,
+                config["visual_gait_assessment"]["moderate"],
+                config["visual_gait_assessment"]["high"],
+                "gt",
+            ),
+            "unit": "score",
+        }
+    indicators["slow_speed"] = {
+        "label": "Slow walking speed",
+        "value": round(speed, 3),
+        "moderate_threshold": config["speed"]["moderate"],
+        "high_threshold": config["speed"]["high"],
+        "direction": "lt",
+        "score": _score_threshold(speed, config["speed"]["moderate"], config["speed"]["high"], "lt"),
+        "unit": "m/s",
     }
 
     for item in indicators.values():
@@ -130,13 +258,22 @@ def build_stroke_gait_analysis(summary: dict[str, Any] | None) -> dict[str, Any]
     walking_capacity_score = max(indicators["slow_speed"]["score"], indicators["low_cadence"]["score"])
     spatial_asymmetry_score = indicators["gait_asymmetry"]["score"]
     temporal_variability_score = max(indicators["stride_variability"]["score"], indicators["step_timing_asymmetry"]["score"])
-    dynamic_stability_score = indicators["low_stability"]["score"]
+    dynamic_stability_inputs = [indicators["low_stability"]["score"]]
+    if clinical_enabled:
+        dynamic_stability_inputs.extend(
+            [
+                indicators["prolonged_tug"]["score"],
+                indicators["prolonged_turn_duration"]["score"],
+                indicators["visual_gait_burden"]["score"],
+            ]
+        )
+    dynamic_stability_score = max(dynamic_stability_inputs)
 
     speed_band = (
         "household_only"
-        if speed < 0.4
+        if speed < config["speed"]["high"]
         else "limited_community"
-        if speed < 0.8
+        if speed < config["speed"]["moderate"]
         else "community_plus"
     )
 
@@ -180,11 +317,20 @@ def build_stroke_gait_analysis(summary: dict[str, Any] | None) -> dict[str, Any]
         "dynamic_stability": _build_domain_result(
             name="Dynamic stability",
             score=dynamic_stability_score,
-            evidence=[indicators["low_stability"]],
+            evidence=(
+                [
+                    indicators["low_stability"],
+                    indicators["prolonged_tug"],
+                    indicators["prolonged_turn_duration"],
+                    indicators["visual_gait_burden"],
+                ]
+                if clinical_enabled
+                else [indicators["low_stability"]]
+            ),
             summary=(
-                "Dynamic stability is substantially reduced."
+                "Dynamic stability and functional mobility markers are substantially reduced."
                 if dynamic_stability_score >= 2
-                else "Dynamic stability shows a borderline reduction."
+                else "Dynamic stability or functional mobility shows a borderline reduction."
                 if dynamic_stability_score == 1
                 else "Dynamic stability is not materially flagged."
             ),
@@ -192,7 +338,13 @@ def build_stroke_gait_analysis(summary: dict[str, Any] | None) -> dict[str, Any]
     }
 
     pattern_score = sum(domain["score"] for domain in domain_scores.values())
-    pattern_level = "High" if pattern_score >= 5 else "Moderate" if pattern_score >= 2 else "Low"
+    pattern_level = (
+        "High"
+        if pattern_score >= config["pattern_level"]["high_min"]
+        else "Moderate"
+        if pattern_score >= config["pattern_level"]["moderate_min"]
+        else "Low"
+    )
     flagged_indicators = [item for item in indicators.values() if item["abnormal"]]
     flagged_count = len(flagged_indicators)
     risk_score = round(pattern_score / 8.0, 3)
@@ -226,10 +378,61 @@ def build_stroke_gait_analysis(summary: dict[str, Any] | None) -> dict[str, Any]
         "speed_band": {
             "label": speed_band,
             "walking_speed_mps": round(speed, 3),
-            "household_threshold_mps": 0.4,
-            "community_threshold_mps": 0.8,
+            "household_threshold_mps": config["speed"]["high"],
+            "community_threshold_mps": config["speed"]["moderate"],
         },
         "summary_note": summary_note,
         "clinical_note": "Literature-based gait screen only. Do not use as a stroke diagnosis.",
         "technical_note": "Designed for gait-pattern triage and rehabilitation review, not cerebrovascular event prediction.",
+        "threshold_profile": {
+            "speed": config["speed"],
+            "cadence": config["cadence"],
+            "asymmetry": config["asymmetry"],
+            "stability": config["stability"],
+            "tug_seconds": config["tug_seconds"],
+            "turn_duration_seconds": config["turn_duration_seconds"],
+            "visual_gait_assessment": config["visual_gait_assessment"],
+            "stride_time_cv": config["stride_time_cv"],
+            "step_time_asymmetry": config["step_time_asymmetry"],
+            "pattern_level": config["pattern_level"],
+        },
+    }
+
+
+def build_stroke_gait_layers(
+    summary: dict[str, Any] | None,
+    *,
+    video_only_profile: str = "default",
+    clinical_augmented_profile: str = "voisard_hs_calibrated",
+) -> dict[str, Any]:
+    video_only_thresholds = VIDEO_ONLY_THRESHOLD_PROFILES.get(
+        video_only_profile,
+        DEFAULT_STROKE_GAIT_THRESHOLDS,
+    )
+    clinical_thresholds = CLINICAL_AUGMENTED_THRESHOLD_PROFILES.get(
+        clinical_augmented_profile,
+        VOISARD_HS_CALIBRATED_THRESHOLDS,
+    )
+    video_only = build_stroke_gait_analysis(
+        summary,
+        thresholds=video_only_thresholds,
+        include_clinical_metadata=False,
+    )
+    clinical_augmented = build_stroke_gait_analysis(
+        summary,
+        thresholds=clinical_thresholds,
+        include_clinical_metadata=True,
+    )
+    return {
+        "default_mode": "video_only",
+        "video_only": {
+            **video_only,
+            "mode": "video_only",
+            "mode_label": "Video-only Stroke Gait Screen",
+        },
+        "clinical_augmented": {
+            **clinical_augmented,
+            "mode": "clinical_augmented",
+            "mode_label": "Clinical-augmented Stroke Gait Screen",
+        },
     }

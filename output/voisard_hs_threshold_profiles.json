@@ -1,0 +1,855 @@
+{
+  "dataset": "data/external/voisard_2025/unpacked",
+  "n_records": 488,
+  "profiles": {
+    "default": {
+      "cohorts": {
+        "CVA": {
+          "n": 128,
+          "mean_pattern_score": 4.312,
+          "high_share": 0.469,
+          "moderate_or_higher_share": 0.977
+        },
+        "HS": {
+          "n": 360,
+          "mean_pattern_score": 3.322,
+          "high_share": 0.286,
+          "moderate_or_higher_share": 0.903
+        }
+      },
+      "deltas": {
+        "mean_pattern_score": 0.99,
+        "high_share": 0.183
+      }
+    },
+    "voisard_hs_calibrated": {
+      "cohorts": {
+        "CVA": {
+          "n": 128,
+          "mean_pattern_score": 3.562,
+          "high_share": 0.094,
+          "moderate_or_higher_share": 0.938
+        },
+        "HS": {
+          "n": 360,
+          "mean_pattern_score": 2.642,
+          "high_share": 0.0,
+          "moderate_or_higher_share": 0.847
+        }
+      },
+      "deltas": {
+        "mean_pattern_score": 0.92,
+        "high_share": 0.094
+      }
+    },
+    "s0.80_c96_st0.18_v6.0_t14_u3.0_g1.5_h6": {
+      "cohorts": {
+        "CVA": {
+          "n": 128,
+          "mean_pattern_score": 3.68,
+          "high_share": 0.102,
+          "moderate_or_higher_share": 0.938
+        },
+        "HS": {
+          "n": 360,
+          "mean_pattern_score": 2.647,
+          "high_share": 0.0,
+          "moderate_or_higher_share": 0.847
+        }
+      },
+      "deltas": {
+        "mean_pattern_score": 1.033,
+        "high_share": 0.102
+      }
+    }
+  },
+  "recommended_profile": "s0.80_c96_st0.18_v6.0_t14_u3.0_g1.5_h6",
+  "threshold_sweep": {
+    "hs_high_share_max": 0.05,
+    "n_candidates": 256,
+    "n_eligible": 128,
+    "best_profile": {
+      "name": "s0.80_c96_st0.18_v6.0_t14_u3.0_g1.5_h6",
+      "thresholds": {
+        "speed": {
+          "moderate": 0.8,
+          "high": 0.35
+        },
+        "cadence": {
+          "moderate": 96.0,
+          "high": 84.0
+        },
+        "asymmetry": {
+          "moderate": 0.22,
+          "high": 0.38
+        },
+        "stability": {
+          "moderate": 0.18,
+          "high": 0.06
+        },
+        "tug_seconds": {
+          "moderate": 14.0,
+          "high": 20.0
+        },
+        "turn_duration_seconds": {
+          "moderate": 3.0,
+          "high": 4.2
+        },
+        "visual_gait_assessment": {
+          "moderate": 1.5,
+          "high": 2.5
+        },
+        "stride_time_cv": {
+          "moderate": 6.0,
+          "high": 9.5
+        },
+        "step_time_asymmetry": {
+          "moderate": 0.06,
+          "high": 0.09
+        },
+        "pattern_level": {
+          "moderate_min": 2,
+          "high_min": 6
+        }
+      },
+      "comparison": {
+        "cohorts": {
+          "CVA": {
+            "n": 128,
+            "mean_pattern_score": 3.68,
+            "high_share": 0.102,
+            "moderate_or_higher_share": 0.938
+          },
+          "HS": {
+            "n": 360,
+            "mean_pattern_score": 2.647,
+            "high_share": 0.0,
+            "moderate_or_higher_share": 0.847
+          }
+        },
+        "deltas": {
+          "mean_pattern_score": 1.033,
+          "high_share": 0.102
+        }
+      },
+      "ranking": {
+        "hs_high_share": 0.0,
+        "cva_high_share": 0.102,
+        "high_share_delta": 0.102,
+        "mean_score_delta": 1.033
+      }
+    },
+    "top_frontier": [
+      {
+        "name": "s0.76_c96_st0.18_v5.5_t14_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 96.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.18,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 14.0,
+            "high": 20.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 5.5,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.664,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.945
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.703,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.853
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 0.961,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 0.961
+        }
+      },
+      {
+        "name": "s0.76_c96_st0.18_v5.5_t15_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 96.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.18,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 15.0,
+            "high": 21.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 5.5,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.664,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.945
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.703,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.853
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 0.961,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 0.961
+        }
+      },
+      {
+        "name": "s0.76_c96_st0.18_v6.0_t14_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 96.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.18,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 14.0,
+            "high": 20.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 6.0,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.633,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.93
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.633,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.842
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 1.0,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 1.0
+        }
+      },
+      {
+        "name": "s0.76_c96_st0.18_v6.0_t15_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 96.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.18,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 15.0,
+            "high": 21.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 6.0,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.633,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.93
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.633,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.842
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 1.0,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 1.0
+        }
+      },
+      {
+        "name": "s0.76_c96_st0.20_v5.5_t14_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 96.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.2,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 14.0,
+            "high": 20.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 5.5,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.695,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.945
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.942,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.875
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 0.753,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 0.753
+        }
+      },
+      {
+        "name": "s0.76_c96_st0.20_v5.5_t15_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 96.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.2,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 15.0,
+            "high": 21.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 5.5,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.695,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.945
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.942,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.875
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 0.753,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 0.753
+        }
+      },
+      {
+        "name": "s0.76_c96_st0.20_v6.0_t14_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 96.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.2,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 14.0,
+            "high": 20.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 6.0,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.664,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.93
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.872,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.864
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 0.792,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 0.792
+        }
+      },
+      {
+        "name": "s0.76_c96_st0.20_v6.0_t15_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 96.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.2,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 15.0,
+            "high": 21.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 6.0,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.664,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.93
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.872,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.864
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 0.792,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 0.792
+        }
+      },
+      {
+        "name": "s0.76_c100_st0.18_v5.5_t14_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 100.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.18,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 14.0,
+            "high": 20.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 5.5,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.688,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.945
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.758,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.861
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 0.93,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 0.93
+        }
+      },
+      {
+        "name": "s0.76_c100_st0.18_v5.5_t15_u3.0_g1.5_h6",
+        "thresholds": {
+          "speed": {
+            "moderate": 0.76,
+            "high": 0.35
+          },
+          "cadence": {
+            "moderate": 100.0,
+            "high": 84.0
+          },
+          "asymmetry": {
+            "moderate": 0.22,
+            "high": 0.38
+          },
+          "stability": {
+            "moderate": 0.18,
+            "high": 0.06
+          },
+          "tug_seconds": {
+            "moderate": 15.0,
+            "high": 21.0
+          },
+          "turn_duration_seconds": {
+            "moderate": 3.0,
+            "high": 4.2
+          },
+          "visual_gait_assessment": {
+            "moderate": 1.5,
+            "high": 2.5
+          },
+          "stride_time_cv": {
+            "moderate": 5.5,
+            "high": 9.5
+          },
+          "step_time_asymmetry": {
+            "moderate": 0.06,
+            "high": 0.09
+          },
+          "pattern_level": {
+            "moderate_min": 2,
+            "high_min": 6
+          }
+        },
+        "comparison": {
+          "cohorts": {
+            "CVA": {
+              "n": 128,
+              "mean_pattern_score": 3.688,
+              "high_share": 0.102,
+              "moderate_or_higher_share": 0.945
+            },
+            "HS": {
+              "n": 360,
+              "mean_pattern_score": 2.758,
+              "high_share": 0.0,
+              "moderate_or_higher_share": 0.861
+            }
+          },
+          "deltas": {
+            "mean_pattern_score": 0.93,
+            "high_share": 0.102
+          }
+        },
+        "ranking": {
+          "hs_high_share": 0.0,
+          "cva_high_share": 0.102,
+          "high_share_delta": 0.102,
+          "mean_score_delta": 0.93
+        }
+      }
+    ]
+  }
+}

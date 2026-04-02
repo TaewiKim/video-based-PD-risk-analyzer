@@ -1,0 +1,44 @@
+{
+  "n_records": 2,
+  "pattern_level_counts": {
+    "High": 2
+  },
+  "speed_band_counts": {
+    "household_only": 2
+  },
+  "mean_pattern_score": 6.0,
+  "mean_flagged_count": 4.0,
+  "domain_flag_counts": {
+    "walking_capacity": 2,
+    "spatial_asymmetry": 2,
+    "temporal_variability": 2,
+    "dynamic_stability": 2
+  },
+  "threshold_review": {
+    "prominent_pattern_share": 1.0,
+    "limited_community_share": 1.0,
+    "max_pattern_score": 6,
+    "min_pattern_score": 6
+  },
+  "top_examples": [
+    {
+      "file": "server/runtime/results/3c59b5e971a84ed3ab153f9427ee9920_results.json",
+      "pattern_level": "High",
+      "pattern_score": 6,
+      "speed_band": "household_only",
+      "summary_note": "Slow walking speed, Marked gait asymmetry, Low gait stability, High stride-time variability"
+    },
+    {
+      "file": "server/runtime/results/fce59db8c5a44e32a2a3028c541faad9_results.json",
+      "pattern_level": "High",
+      "pattern_score": 6,
+      "speed_band": "household_only",
+      "summary_note": "Slow walking speed, Marked gait asymmetry, Low gait stability, High stride-time variability"
+    }
+  ],
+  "generated_at": "2026-04-01T05:23:46.502457+00:00",
+  "source_paths": [
+    "server/runtime/results/3c59b5e971a84ed3ab153f9427ee9920_results.json",
+    "server/runtime/results/fce59db8c5a44e32a2a3028c541faad9_results.json"
+  ]
+}

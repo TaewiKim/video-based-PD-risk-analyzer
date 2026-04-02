@@ -1936,7 +1936,7 @@
                         <div class="result-layer-tabs" role="tablist" aria-label="Analysis result layers">
                             <button class="result-layer-tab" type="button" role="tab" id="result-tab-gait" data-layer="gait" aria-selected="false" aria-controls="gaitAnalysisLayer" data-i18n="results.tab_gait" onclick="setActiveResultLayer('gait')">보행분석</button>
                             <button class="result-layer-tab" type="button" role="tab" id="result-tab-pd" data-layer="pd" aria-selected="false" aria-controls="pdScreeningLayer" data-i18n="results.tab_pd" onclick="setActiveResultLayer('pd')">PD risk 분석</button>
-                            <button class="result-layer-tab" type="button" role="tab" id="result-tab-stroke" data-layer="stroke" aria-selected="false" aria-controls="strokeAnalysisLayer" data-i18n="results.tab_stroke" onclick="setActiveResultLayer('stroke')">Stroke risk 분석</button>
+                            <button class="result-layer-tab" type="button" role="tab" id="result-tab-stroke" data-layer="stroke" aria-selected="false" aria-controls="strokeAnalysisLayer" data-i18n="results.tab_stroke" onclick="setActiveResultLayer('stroke')">뇌졸중 연관 보행 분석</button>
                         </div>
                         <section class="layer-section" id="pdScreeningLayer">
                             <div class="layer-header">
@@ -2328,58 +2328,114 @@
                                     <div class="layer-header-tag" data-i18n="layers.stroke_tag">브랜치 B · Stroke</div>
                                 </div>
                             </div>
-                            <div class="metric-cluster">
-                                <div class="cluster-title">
-                                    <div>
-                                        <div class="cluster-kicker" data-i18n="stroke.kicker">Stroke-linked gait screen</div>
-                                        <h3 data-i18n="stroke.title">뇌졸중 연관 보행 위험</h3>
+                            <div class="results-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
+                                <div class="metric-cluster">
+                                    <div class="cluster-title">
+                                        <div>
+                                            <div class="cluster-kicker" data-i18n="stroke.video_kicker">Video-only stroke gait screen</div>
+                                            <h3 data-i18n="stroke.video_title">비디오 기반 판독</h3>
+                                        </div>
+                                    </div>
+                                    <div class="section-intro" data-i18n="stroke.video_intro">보행 요약 지표만으로 계산한 기본 stroke gait screen입니다. 제품 기본값은 이 레이어를 우선 표시합니다.</div>
+                                    <div class="classification-box" id="strokeVideoRiskBox">
+                                        <div class="classification-label" id="strokeVideoRiskLabel">-</div>
+                                        <div class="classification-sub" id="strokeVideoRiskSub">-</div>
+                                    </div>
+                                    <div class="pd-risk-box" style="margin-top: 14px;">
+                                        <div class="pd-risk-item">
+                                            <div class="pd-risk-score" id="strokeVideoRiskScore">-</div>
+                                            <div class="pd-risk-label" data-i18n="stroke.score">Stroke-linked Gait Pattern Score</div>
+                                        </div>
+                                        <div class="pd-risk-item">
+                                            <div class="pd-risk-score" id="strokeVideoRiskLevel">-</div>
+                                            <div class="pd-risk-label" data-i18n="stroke.level">Pattern Level</div>
+                                        </div>
+                                        <div class="pd-risk-item">
+                                            <div class="pd-risk-score" id="strokeVideoSpeedBand">-</div>
+                                            <div class="pd-risk-label" data-i18n="stroke.speed_band">Walking Speed Band</div>
+                                        </div>
+                                    </div>
+                                    <div class="results-grid" style="margin-top: 14px;">
+                                        <div class="result-box" id="strokeVideoDomainCapacityBox">
+                                            <div class="result-value" id="strokeVideoDomainCapacityValue">-</div>
+                                            <div class="result-label" data-i18n="stroke.domain_capacity">보행 능력</div>
+                                            <div class="result-status" id="strokeVideoDomainCapacityDetail">-</div>
+                                        </div>
+                                        <div class="result-box" id="strokeVideoDomainSpatialBox">
+                                            <div class="result-value" id="strokeVideoDomainSpatialValue">-</div>
+                                            <div class="result-label" data-i18n="stroke.domain_spatial">공간 비대칭</div>
+                                            <div class="result-status" id="strokeVideoDomainSpatialDetail">-</div>
+                                        </div>
+                                        <div class="result-box" id="strokeVideoDomainTemporalBox">
+                                            <div class="result-value" id="strokeVideoDomainTemporalValue">-</div>
+                                            <div class="result-label" data-i18n="stroke.domain_temporal">시간 변동성</div>
+                                            <div class="result-status" id="strokeVideoDomainTemporalDetail">-</div>
+                                        </div>
+                                        <div class="result-box" id="strokeVideoDomainStabilityBox">
+                                            <div class="result-value" id="strokeVideoDomainStabilityValue">-</div>
+                                            <div class="result-label" data-i18n="stroke.domain_stability">동적 안정성</div>
+                                            <div class="result-status" id="strokeVideoDomainStabilityDetail">-</div>
+                                        </div>
+                                    </div>
+                                    <div class="input-processing-notice" style="margin-top: 14px;">
+                                        <strong data-i18n="stroke.summary_title">핵심 근거</strong>
+                                        <span id="strokeVideoSummaryNote" style="display:block; margin-top:6px;">-</span>
+                                        <span id="strokeVideoTechnicalNote" style="display:block; margin-top:6px; color:#7a5615;">-</span>
                                     </div>
                                 </div>
-                                <div class="section-intro" data-i18n="stroke.intro">보행 속도, 좌우 비대칭, 안정성, 케이던스를 조합해 뇌졸중 연관 보행 패턴 가능성을 참고용으로 요약합니다.</div>
-                                <div class="classification-box" id="strokeRiskBox">
-                                    <div class="classification-label" id="strokeRiskLabel">-</div>
-                                    <div class="classification-sub" id="strokeRiskSub">-</div>
-                                </div>
-                                <div class="pd-risk-box" style="margin-top: 14px;">
-                                    <div class="pd-risk-item">
-                                        <div class="pd-risk-score" id="strokeRiskScore">-</div>
-                                        <div class="pd-risk-label" data-i18n="stroke.score">Stroke-linked Gait Pattern Score</div>
+                                <div class="metric-cluster">
+                                    <div class="cluster-title">
+                                        <div>
+                                            <div class="cluster-kicker" data-i18n="stroke.clinical_kicker">Clinical-augmented stroke gait screen</div>
+                                            <h3 data-i18n="stroke.clinical_title">임상 보강 판독</h3>
+                                        </div>
                                     </div>
-                                    <div class="pd-risk-item">
-                                        <div class="pd-risk-score" id="strokeRiskLevel">-</div>
-                                        <div class="pd-risk-label" data-i18n="stroke.level">Pattern Level</div>
+                                    <div class="section-intro" data-i18n="stroke.clinical_intro">TUG, 회전 시간, 시각 보행평가처럼 임상 메타데이터가 있을 때만 추가로 계산하는 보강 해석 레이어입니다.</div>
+                                    <div class="classification-box" id="strokeClinicalRiskBox">
+                                        <div class="classification-label" id="strokeClinicalRiskLabel">-</div>
+                                        <div class="classification-sub" id="strokeClinicalRiskSub">-</div>
                                     </div>
-                                    <div class="pd-risk-item">
-                                        <div class="pd-risk-score" id="strokeSpeedBand">-</div>
-                                        <div class="pd-risk-label" data-i18n="stroke.speed_band">Walking Speed Band</div>
+                                    <div class="pd-risk-box" style="margin-top: 14px;">
+                                        <div class="pd-risk-item">
+                                            <div class="pd-risk-score" id="strokeClinicalRiskScore">-</div>
+                                            <div class="pd-risk-label" data-i18n="stroke.score">Stroke-linked Gait Pattern Score</div>
+                                        </div>
+                                        <div class="pd-risk-item">
+                                            <div class="pd-risk-score" id="strokeClinicalRiskLevel">-</div>
+                                            <div class="pd-risk-label" data-i18n="stroke.level">Pattern Level</div>
+                                        </div>
+                                        <div class="pd-risk-item">
+                                            <div class="pd-risk-score" id="strokeClinicalSpeedBand">-</div>
+                                            <div class="pd-risk-label" data-i18n="stroke.speed_band">Walking Speed Band</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="results-grid" style="margin-top: 14px;">
-                                    <div class="result-box" id="strokeDomainCapacityBox">
-                                        <div class="result-value" id="strokeDomainCapacityValue">-</div>
-                                        <div class="result-label" data-i18n="stroke.domain_capacity">보행 능력</div>
-                                        <div class="result-status" id="strokeDomainCapacityDetail">-</div>
+                                    <div class="results-grid" style="margin-top: 14px;">
+                                        <div class="result-box" id="strokeClinicalDomainCapacityBox">
+                                            <div class="result-value" id="strokeClinicalDomainCapacityValue">-</div>
+                                            <div class="result-label" data-i18n="stroke.domain_capacity">보행 능력</div>
+                                            <div class="result-status" id="strokeClinicalDomainCapacityDetail">-</div>
+                                        </div>
+                                        <div class="result-box" id="strokeClinicalDomainSpatialBox">
+                                            <div class="result-value" id="strokeClinicalDomainSpatialValue">-</div>
+                                            <div class="result-label" data-i18n="stroke.domain_spatial">공간 비대칭</div>
+                                            <div class="result-status" id="strokeClinicalDomainSpatialDetail">-</div>
+                                        </div>
+                                        <div class="result-box" id="strokeClinicalDomainTemporalBox">
+                                            <div class="result-value" id="strokeClinicalDomainTemporalValue">-</div>
+                                            <div class="result-label" data-i18n="stroke.domain_temporal">시간 변동성</div>
+                                            <div class="result-status" id="strokeClinicalDomainTemporalDetail">-</div>
+                                        </div>
+                                        <div class="result-box" id="strokeClinicalDomainStabilityBox">
+                                            <div class="result-value" id="strokeClinicalDomainStabilityValue">-</div>
+                                            <div class="result-label" data-i18n="stroke.domain_stability">동적 안정성</div>
+                                            <div class="result-status" id="strokeClinicalDomainStabilityDetail">-</div>
+                                        </div>
                                     </div>
-                                    <div class="result-box" id="strokeDomainSpatialBox">
-                                        <div class="result-value" id="strokeDomainSpatialValue">-</div>
-                                        <div class="result-label" data-i18n="stroke.domain_spatial">공간 비대칭</div>
-                                        <div class="result-status" id="strokeDomainSpatialDetail">-</div>
+                                    <div class="input-processing-notice" style="margin-top: 14px;">
+                                        <strong data-i18n="stroke.summary_title">핵심 근거</strong>
+                                        <span id="strokeClinicalSummaryNote" style="display:block; margin-top:6px;">-</span>
+                                        <span id="strokeClinicalTechnicalNote" style="display:block; margin-top:6px; color:#7a5615;">-</span>
                                     </div>
-                                    <div class="result-box" id="strokeDomainTemporalBox">
-                                        <div class="result-value" id="strokeDomainTemporalValue">-</div>
-                                        <div class="result-label" data-i18n="stroke.domain_temporal">시간 변동성</div>
-                                        <div class="result-status" id="strokeDomainTemporalDetail">-</div>
-                                    </div>
-                                    <div class="result-box" id="strokeDomainStabilityBox">
-                                        <div class="result-value" id="strokeDomainStabilityValue">-</div>
-                                        <div class="result-label" data-i18n="stroke.domain_stability">동적 안정성</div>
-                                        <div class="result-status" id="strokeDomainStabilityDetail">-</div>
-                                    </div>
-                                </div>
-                                <div class="input-processing-notice" style="margin-top: 14px;">
-                                    <strong data-i18n="stroke.summary_title">핵심 근거</strong>
-                                    <span id="strokeSummaryNote" style="display:block; margin-top:6px;">-</span>
-                                    <span id="strokeTechnicalNote" style="display:block; margin-top:6px; color:#7a5615;">-</span>
                                 </div>
                             </div>
                         </section>
@@ -2912,7 +2968,7 @@
                 'results.layer_overview_stroke_copy': '같은 보행 요약으로 뇌졸중 연관 위험을 검토합니다.',
                 'results.tab_gait': '보행분석',
                 'results.tab_pd': 'PD risk 분석',
-                'results.tab_stroke': 'Stroke risk 분석',
+                'results.tab_stroke': '뇌졸중 연관 보행 분석',
                 'results.readout_label': '1차 판독',
                 'results.readout_copy': '먼저 읽는 임상 판독 블록입니다. 기술 정보는 별도 영역으로 분리해 판정과 혼동되지 않게 했습니다.',
                 'results.next_step_title': '다음 검토 단계',
@@ -2980,6 +3036,12 @@
                 'gait.preprocessing_copy': 'FPS 정규화(target=30), 위치 정렬(origin + PCA 전방축), 속도 이상치 절단(99백분위)을 적용한 뒤 피검자 기준으로 집계했습니다. 웹 판정은 문헌 기반 보행 바이오마커를 기준으로 하며, 보조 모델 점수는 별도 참고 정보로만 표시합니다.',
                 'stroke.kicker': '문헌 기반 뇌졸중 연관 보행 분석',
                 'stroke.title': '뇌졸중 연관 보행 패턴',
+                'stroke.video_kicker': '비디오 기반 보행 판독',
+                'stroke.video_title': '비디오 기반 판독',
+                'stroke.video_intro': '보행 요약 지표만으로 계산한 기본 판독입니다. 제품 기본값은 이 레이어를 우선 표시합니다.',
+                'stroke.clinical_kicker': '임상 보강 판독',
+                'stroke.clinical_title': '임상 보강 판독',
+                'stroke.clinical_intro': 'TUG, 회전 시간, 시각 보행평가처럼 임상 메타데이터가 있을 때만 추가로 계산하는 보강 해석입니다.',
                 'stroke.intro': '보행 속도, 비대칭, 시간 변동성, 동적 안정성을 묶어 post-stroke 보행 패턴 가능성을 스크리닝합니다.',
                 'stroke.score': '패턴 점수',
                 'stroke.level': '패턴 수준',
@@ -3106,7 +3168,7 @@
                 'results.layer_overview_stroke_copy': 'Use the same gait summary to review stroke-linked gait risk.',
                 'results.tab_gait': 'Gait Analysis',
                 'results.tab_pd': 'PD Risk Analysis',
-                'results.tab_stroke': 'Stroke Risk Analysis',
+                'results.tab_stroke': 'Stroke-linked Gait Analysis',
                 'results.readout_label': 'Primary Readout',
                 'results.readout_copy': 'This is the first clinical readout block. Technical context is separated so it does not compete with the clinical impression.',
                 'results.next_step_title': 'Next Review Step',
@@ -3174,6 +3236,12 @@
                 'gait.preprocessing_copy': 'FPS normalization (target=30), translation alignment (origin + PCA forward axis), and velocity outlier clipping (99th percentile) are applied before subject-level aggregation. The web decision is based on literature gait biomarkers, while the support-model score is shown as separate context only.',
                 'stroke.kicker': 'Literature-based stroke-linked gait analysis',
                 'stroke.title': 'Stroke-linked Gait Pattern',
+                'stroke.video_kicker': 'Video-only stroke gait screen',
+                'stroke.video_title': 'Video-only Read',
+                'stroke.video_intro': 'This default layer uses gait-summary features only and does not depend on extra clinical metadata.',
+                'stroke.clinical_kicker': 'Clinical-augmented stroke gait screen',
+                'stroke.clinical_title': 'Clinical-augmented Read',
+                'stroke.clinical_intro': 'This secondary layer is shown only as a clinical add-on when TUG, turn duration, or visual gait assessment metadata are available.',
                 'stroke.intro': 'Screens for possible post-stroke gait patterns using walking capacity, asymmetry, temporal variability, and dynamic stability.',
                 'stroke.score': 'Pattern Score',
                 'stroke.level': 'Pattern Level',
@@ -3404,6 +3472,34 @@
             }[status] || status || '-';
         }
 
+        function translateStrokeText(text) {
+            if (!text || appState.language !== 'ko') return text || '-';
+            const replacements = new Map([
+                ['Post-stroke gait pattern is prominent', '뇌졸중 연관 보행 패턴 가능성이 높습니다'],
+                ['Post-stroke gait pattern is possible', '뇌졸중 연관 보행 패턴 가능성이 있습니다'],
+                ['Literature-based gait screen only. Do not use as a stroke diagnosis.', '문헌 기반 보행 스크리닝 결과입니다. 뇌졸중 진단으로 사용하면 안 됩니다.'],
+                ['Designed for gait-pattern triage and rehabilitation review, not cerebrovascular event prediction.', '보행 패턴 분류와 재활 검토용 참고 결과이며, 뇌혈관 사건 발생 예측으로 사용하지 않습니다.'],
+                ['No gait summary available.', '보행 요약이 없어 산출할 수 없습니다.'],
+                ['Gait-derived screen unavailable.', '보행 기반 스크리닝 결과를 만들 수 없습니다.'],
+                ['Stroke-linked gait analysis requires a usable gait summary.', '사용 가능한 보행 요약이 있어야 뇌졸중 연관 보행 분석을 계산할 수 있습니다.'],
+                ['Marked gait asymmetry', '보행 비대칭 증가'],
+                ['Low gait stability', '보행 안정성 저하'],
+                ['Reduced cadence', '케이던스 저하'],
+                ['High stride-time variability', '보행 주기 변동성 증가'],
+                ['Step-time asymmetry', '스텝 시간 비대칭'],
+                ['Prolonged TUG', 'TUG 시간 지연'],
+                ['Prolonged turn duration', '회전 시간 지연'],
+                ['Elevated visual gait assessment', '시각 보행평가 이상'],
+                ['Slow walking speed', '보행 속도 저하'],
+            ]);
+
+            let localized = String(text);
+            replacements.forEach((value, key) => {
+                localized = localized.replaceAll(key, value);
+            });
+            return localized;
+        }
+
         function deriveStrokeScreening(results) {
             const provided = results?.stroke_gait_analysis
                 || results?.stroke_screening
@@ -3563,8 +3659,25 @@
             };
         }
 
-        function renderStrokeScreening(strokeScreening) {
-            const riskBox = document.getElementById('strokeRiskBox');
+        function deriveStrokeLayers(results) {
+            const provided = results?.stroke_analysis_layers || results?.gait_analysis?.stroke_analysis_layers;
+            if (provided?.video_only || provided?.clinical_augmented) {
+                return {
+                    default_mode: provided.default_mode || 'video_only',
+                    video_only: provided.video_only || deriveStrokeScreening(results),
+                    clinical_augmented: provided.clinical_augmented || deriveStrokeScreening(results),
+                };
+            }
+            const fallback = deriveStrokeScreening(results);
+            return {
+                default_mode: 'video_only',
+                video_only: fallback,
+                clinical_augmented: fallback,
+            };
+        }
+
+        function renderStrokeScreening(strokeScreening, prefix = 'strokeVideo') {
+            const riskBox = document.getElementById(`${prefix}RiskBox`);
             const riskLevel = strokeScreening?.pattern_level || strokeScreening?.risk_level || 'Unknown';
             riskBox.className = 'classification-box';
             if (strokeScreening?.available === false) {
@@ -3575,17 +3688,17 @@
                 riskBox.classList.add('warning');
             }
 
-            document.getElementById('strokeRiskLabel').textContent = strokeScreening?.label || '-';
-            document.getElementById('strokeRiskSub').textContent = strokeScreening
-                ? `${strokeScreening.summary_note} | ${strokeScreening.clinical_note}`
+            document.getElementById(`${prefix}RiskLabel`).textContent = translateStrokeText(strokeScreening?.label || '-');
+            document.getElementById(`${prefix}RiskSub`).textContent = strokeScreening
+                ? `${translateStrokeText(strokeScreening.summary_note)} | ${translateStrokeText(strokeScreening.clinical_note)}`
                 : '-';
-            document.getElementById('strokeRiskScore').textContent = strokeScreening
+            document.getElementById(`${prefix}RiskScore`).textContent = strokeScreening
                 ? `${strokeScreening.pattern_score ?? Math.round(Number(strokeScreening.risk_score || 0) * 100)}`
                 : '-';
-            const strokeRiskLevelEl = document.getElementById('strokeRiskLevel');
+            const strokeRiskLevelEl = document.getElementById(`${prefix}RiskLevel`);
             strokeRiskLevelEl.textContent = translateRiskLevel(riskLevel);
             strokeRiskLevelEl.className = 'pd-risk-score ' + (riskLevel === 'High' ? 'risk-high' : riskLevel === 'Moderate' ? 'risk-moderate' : 'risk-low');
-            document.getElementById('strokeSpeedBand').textContent = strokeScreening
+            document.getElementById(`${prefix}SpeedBand`).textContent = strokeScreening
                 ? strokeSpeedBandLabel(strokeScreening.speed_band?.label)
                 : '-';
 
@@ -3597,9 +3710,9 @@
             ];
             domainMap.forEach(([key, suffix]) => {
                 const domain = strokeScreening?.domain_scores?.[key];
-                const valueEl = document.getElementById(`strokeDomain${suffix}Value`);
-                const detailEl = document.getElementById(`strokeDomain${suffix}Detail`);
-                const boxEl = document.getElementById(`strokeDomain${suffix}Box`);
+                const valueEl = document.getElementById(`${prefix}Domain${suffix}Value`);
+                const detailEl = document.getElementById(`${prefix}Domain${suffix}Detail`);
+                const boxEl = document.getElementById(`${prefix}Domain${suffix}Box`);
                 if (!valueEl || !detailEl || !boxEl) return;
                 valueEl.textContent = domain ? `${domain.score}/2` : '-';
                 detailEl.textContent = domain ? strokeStatusLabel(domain.status) : '-';
@@ -3613,8 +3726,8 @@
                 }
             });
 
-            document.getElementById('strokeSummaryNote').textContent = strokeScreening?.summary_note || '-';
-            document.getElementById('strokeTechnicalNote').textContent = strokeScreening?.technical_note || '-';
+            document.getElementById(`${prefix}SummaryNote`).textContent = translateStrokeText(strokeScreening?.summary_note || '-');
+            document.getElementById(`${prefix}TechnicalNote`).textContent = translateStrokeText(strokeScreening?.technical_note || '-');
         }
 
         function translateYesNo(value) {
@@ -5386,23 +5499,25 @@
             document.getElementById('armAsymValue').textContent = '-';
             document.getElementById('stepAsymValue').textContent = '-';
             document.getElementById('armAmplitudeValue').textContent = '-';
-            document.getElementById('strokeRiskLabel').textContent = appState.language === 'ko' ? '보행 데이터 없음' : 'No gait data';
-            document.getElementById('strokeRiskSub').textContent = fallback;
-            document.getElementById('strokeRiskScore').textContent = '-';
-            document.getElementById('strokeRiskLevel').textContent = '-';
-            document.getElementById('strokeSpeedBand').textContent = '-';
-            document.getElementById('strokeDomainCapacityValue').textContent = '-';
-            document.getElementById('strokeDomainCapacityDetail').textContent = '-';
-            document.getElementById('strokeDomainSpatialValue').textContent = '-';
-            document.getElementById('strokeDomainSpatialDetail').textContent = '-';
-            document.getElementById('strokeDomainTemporalValue').textContent = '-';
-            document.getElementById('strokeDomainTemporalDetail').textContent = '-';
-            document.getElementById('strokeDomainStabilityValue').textContent = '-';
-            document.getElementById('strokeDomainStabilityDetail').textContent = '-';
-            document.getElementById('strokeSummaryNote').textContent = fallback;
-            document.getElementById('strokeTechnicalNote').textContent = appState.language === 'ko'
-                ? '유효한 보행 요약이 있어야 뇌졸중 연관 보행 분석을 계산할 수 있습니다.'
-                : 'Stroke-linked gait analysis requires a usable gait summary.';
+            ['strokeVideo', 'strokeClinical'].forEach((prefix) => {
+                document.getElementById(`${prefix}RiskLabel`).textContent = appState.language === 'ko' ? '보행 데이터 없음' : 'No gait data';
+                document.getElementById(`${prefix}RiskSub`).textContent = fallback;
+                document.getElementById(`${prefix}RiskScore`).textContent = '-';
+                document.getElementById(`${prefix}RiskLevel`).textContent = '-';
+                document.getElementById(`${prefix}SpeedBand`).textContent = '-';
+                document.getElementById(`${prefix}DomainCapacityValue`).textContent = '-';
+                document.getElementById(`${prefix}DomainCapacityDetail`).textContent = '-';
+                document.getElementById(`${prefix}DomainSpatialValue`).textContent = '-';
+                document.getElementById(`${prefix}DomainSpatialDetail`).textContent = '-';
+                document.getElementById(`${prefix}DomainTemporalValue`).textContent = '-';
+                document.getElementById(`${prefix}DomainTemporalDetail`).textContent = '-';
+                document.getElementById(`${prefix}DomainStabilityValue`).textContent = '-';
+                document.getElementById(`${prefix}DomainStabilityDetail`).textContent = '-';
+                document.getElementById(`${prefix}SummaryNote`).textContent = fallback;
+                document.getElementById(`${prefix}TechnicalNote`).textContent = appState.language === 'ko'
+                    ? '유효한 보행 요약이 있어야 뇌졸중 연관 보행 분석을 계산할 수 있습니다.'
+                    : 'Stroke-linked gait analysis requires a usable gait summary.';
+            });
             document.getElementById('segmentsList').innerHTML = `<div style="color:#7f94a3; padding: 12px;">${fallback}</div>`;
             document.getElementById('statsTableBody').innerHTML = '';
             document.getElementById('statsQuality').textContent = appState.language === 'ko' ? '데이터 없음' : 'No data';
@@ -5656,7 +5771,9 @@
             document.getElementById('armAmplitudeValue').textContent = armAmp.toFixed(1) + '°';
 
             // Stroke-related gait screen
-            renderStrokeScreening(deriveStrokeScreening(results));
+            const strokeLayers = deriveStrokeLayers(results);
+            renderStrokeScreening(strokeLayers.video_only, 'strokeVideo');
+            renderStrokeScreening(strokeLayers.clinical_augmented, 'strokeClinical');
 
             // Speed comparison bar (using aggregated speed)
             const speedPct = (speed / 1.5) * 100;

@@ -22,7 +22,7 @@ from .api_common import (
 from .jobs import create_job, get_job, run_job
 from .runtime import RESULTS_DIR, UPLOAD_DIR
 from .models import AnalysisResult
-from .stroke_gait_analysis import build_stroke_gait_analysis
+from .stroke_gait_analysis import build_stroke_gait_analysis, build_stroke_gait_layers
 
 
 def _persist_result_record(result_filename: str, result_type: str, video_filename: str, payload: dict) -> None:
@@ -53,11 +53,17 @@ def _build_stroke_screening(summary: dict | None) -> dict:
     return build_stroke_gait_analysis(summary)
 
 
+def _build_stroke_analysis_layers(summary: dict | None) -> dict:
+    return build_stroke_gait_layers(summary)
+
+
 def _attach_review_layers(results: dict) -> dict:
     summary = results.get("summary") or {}
-    stroke_gait_analysis = _build_stroke_screening(summary)
+    stroke_gait_layers = _build_stroke_analysis_layers(summary)
+    stroke_gait_analysis = stroke_gait_layers["video_only"]
     results["stroke_screening"] = stroke_gait_analysis
     results["stroke_gait_analysis"] = stroke_gait_analysis
+    results["stroke_analysis_layers"] = stroke_gait_layers
     results["review_layers"] = {
         "gait_analysis": {
             "title": "Common Gait Analysis",
@@ -137,6 +143,7 @@ def _run_symptom_analysis(filename: str, symptoms) -> tuple[dict, str]:
     activity_timeline = gait_results.get("activity_timeline", {}) or {}
     turn_methodology = gait_results.get("turn_methodology", {}) or {}
     analysis_results = gait_results.get("analysis_results", []) or []
+    stroke_gait_layers = _build_stroke_analysis_layers(summary)
 
     estimated_steps = 0
     for seg in analysis_results:
@@ -178,8 +185,9 @@ def _run_symptom_analysis(filename: str, symptoms) -> tuple[dict, str]:
         },
         "classification": summary.get("overall_classification", "Unknown"),
         "pd_risk_score": float(summary.get("avg_pd_risk_score", 0)) * 100,
-        "stroke_screening": _build_stroke_screening(summary),
-        "stroke_gait_analysis": _build_stroke_screening(summary),
+        "stroke_screening": stroke_gait_layers["video_only"],
+        "stroke_gait_analysis": stroke_gait_layers["video_only"],
+        "stroke_analysis_layers": stroke_gait_layers,
         "segments": walking_segments,
         "fog_transitions": fog_transitions,
         "fog_transition_count": len(fog_transitions),

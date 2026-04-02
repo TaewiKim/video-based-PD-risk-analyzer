@@ -43,6 +43,12 @@ The model consumes gait summary features already produced by the platform:
 - `avg_stride_time_cv`
 - `avg_step_time_asymmetry`
 
+When available from external clinical cohorts, the model also consumes rehabilitation-oriented mobility metadata:
+
+- `tug_seconds`
+- `turn_duration_seconds`
+- `visual_gait_assessment`
+
 ## Domains
 
 The score contains four domains, each scored from 0 to 2:
@@ -167,6 +173,22 @@ Prefer:
 - no large open raw-video stroke gait dataset is currently wired into training
 - thresholds should be re-calibrated once public stroke cohorts are integrated
 - low-quality pose tracks should suppress overconfident interpretation
+
+## Current Profiles
+
+Available threshold profiles in code:
+
+- `DEFAULT_STROKE_GAIT_THRESHOLDS`: literature-first baseline
+- `VOISARD_HS_CALIBRATED_THRESHOLDS`: stricter profile adjusted to reduce `HS` false positive burden on the Voisard 2025 cohort
+
+## Output Modes
+
+The stroke gait output is now split into two interpretation layers:
+
+- `video_only`: uses only gait-derived summary features and is the default product path
+- `clinical_augmented`: adds cohort-level mobility metadata such as `TUG`, `turn_duration_seconds`, and `visual_gait_assessment` when available
+
+For platform UI and product behavior, `video_only` should remain the default. `clinical_augmented` is intended for dataset analysis or clinically enriched workflows.
 
 ## Next Steps
 
